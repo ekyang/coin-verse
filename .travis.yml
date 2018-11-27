@@ -39,3 +39,21 @@ deploy:
       tags: true
       repo: james-lim/coin-verse
       branch: develop
+  - provider: npm
+    email: email@wanseob.com
+    api_key:
+      secure: fK+YnvRp5Nr2KINC8A6kdc4Wtr7Mn0wRaYhCLviQYa8iMGnekD9qWDG8KPBbY8uKFwqrXTJ7onlB38hLPjiohRGRKYFdclCGUvLGXOT6n5F4sVW+8ZL4cOT3JomePzVUnjW4C913Jv468OKmeLrcTWw/bfRS9sXvzbY0nZKQj6OE7iTp5T+GZEbSAnJjZjah/DHEubKvIW6WtPJ7DvDmHjHssYdLce4wV7FpeBzqh2mfX5MdNfcwa+w8z25VM2VyOnaI7LjsVSMn30IpiVE54jv8SDQ3WzMXeIugmI34+gyW1TDqDdB5Jfa/Nr5aphASSMvDfwlVKiT2K0WRDk0alZuvE7otlZYlwVVTSvIKQ8VYUk3iKETkV0TjFPkOTp26IwNQdY4h1mGLLgZJYRopHDvmxRwBlvB5cxK8oQ9dKgA+HBvJsNoqgv2x1Q1L4eCtC4FPfKYDz8Jc1QjpVKmc6XHle9q/BM05UyTK2c9RtBBVpdkbQz0mPYu6aZOUCSi3zEnPzeiQsQATJUknAkj9EVk0PIYm7OB6UfEQPmV3oOXqoQgYZJIMSpIgXaWxcM3d9O3cJ/AlUHM/+hZotTk5ITuVUW+I+ITrulak+k9pFaIWij/2Dx638J+QHbpxlj9b2nMzI/QNNMAm5vZvMll3gH+N6umPw1PxwmCz77b0OEY=
+    tag: latest
+    on:
+      condition: $LATEST != $CURRENT_VERSION
+      branch: master
+      repo: james-lim/coin-verse
+  - provider: npm
+    email: email@wanseob.com
+    api_key:
+      secure: fK+YnvRp5Nr2KINC8A6kdc4Wtr7Mn0wRaYhCLviQYa8iMGnekD9qWDG8KPBbY8uKFwqrXTJ7onlB38hLPjiohRGRKYFdclCGUvLGXOT6n5F4sVW+8ZL4cOT3JomePzVUnjW4C913Jv468OKmeLrcTWw/bfRS9sXvzbY0nZKQj6OE7iTp5T+GZEbSAnJjZjah/DHEubKvIW6WtPJ7DvDmHjHssYdLce4wV7FpeBzqh2mfX5MdNfcwa+w8z25VM2VyOnaI7LjsVSMn30IpiVE54jv8SDQ3WzMXeIugmI34+gyW1TDqDdB5Jfa/Nr5aphASSMvDfwlVKiT2K0WRDk0alZuvE7otlZYlwVVTSvIKQ8VYUk3iKETkV0TjFPkOTp26IwNQdY4h1mGLLgZJYRopHDvmxRwBlvB5cxK8oQ9dKgA+HBvJsNoqgv2x1Q1L4eCtC4FPfKYDz8Jc1QjpVKmc6XHle9q/BM05UyTK2c9RtBBVpdkbQz0mPYu6aZOUCSi3zEnPzeiQsQATJUknAkj9EVk0PIYm7OB6UfEQPmV3oOXqoQgYZJIMSpIgXaWxcM3d9O3cJ/AlUHM/+hZotTk5ITuVUW+I+ITrulak+k9pFaIWij/2Dx638J+QHbpxlj9b2nMzI/QNNMAm5vZvMll3gH+N6umPw1PxwmCz77b0OEY=
+    tag: next
+    on:
+      condition: $NEXT != $CURRENT_VERSION
+      branch: develop
+      repo: james-lim/coin-verse

@@ -1,28 +1,41 @@
 language: node_js
 node_js:
-- "stable"
+  - stable
 
 install:
-- npm install -g truffle
-- npm install -g ganache-cli
-- npm install -g coveralls
-- npm install
+  - npm install -g truffle
+  - npm install -g ganache-cli
+  - npm install -g coveralls
+  - npm install
 
 script:
-- npm run test
+  - npm run test
 
 after_success:
-- export CURRENT_VERSION=$(node -p "require('./package.json').version")
-- export LATEST=$(npm view $(node -p "require('./package.json').name") dist-tags.latest)
-- export NEXT=$(npm view $(node -p "require('./package.json').name") dist-tags.next)
-- npm run coverage && cat coverage/lcov.info | coveralls
+  - export CURRENT_VERSION=$(node -p "require('./package.json').version")
+  - export LATEST=$(npm view $(node -p "require('./package.json').name") dist-tags.latest)
+  - export NEXT=$(npm view $(node -p "require('./package.json').name") dist-tags.next)
+  - npm run coverage && cat coverage/lcov.info | coveralls
 
 before_deploy:
-- if [ "$LATEST" != "$CURRENT_VERSION" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
-  echo "on master branch";
-  export TRAVIS_TAG=v$CURRENT_VERSION;
-  fi;
-- if [ "$NEXT" != "$CURRENT_VERSION" ] && [ "$TRAVIS_BRANCH" = "develop" ]; then
-  echo "on develop branch";
-  export TRAVIS_TAG=v$CURRENT_VERSION-next;
-  fi;
+  - if [ "$LATEST" != "$CURRENT_VERSION" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
+    echo "on master branch"; export TRAVIS_TAG=v$CURRENT_VERSION; fi;
+  - if [ "$NEXT" != "$CURRENT_VERSION" ] && [ "$TRAVIS_BRANCH" = "develop" ]; then echo
+    "on develop branch"; export TRAVIS_TAG=v$CURRENT_VERSION-next; fi;
+
+deploy:
+  - provider: releases
+    api_key:
+      secure: dr8ChsYYvTQRNVhVu2uv44yoS0woKi6HXvCo0VhVrdS86YqQ0PRcdfwUz8mQrG3OuJUUMe1fJjZmZQ/1m30g5b6fmnIoyk2cURdN1ntzE+0cRMv2kO94RJvGw8RFeAFJvCzOUDXYFneBrcqWfltAMeEck1LKbKlzB83stqBg3urw4u9Im/fD6w2IM3m903gTFj4naqJm3myQCFCYz3uOWTSe/fCU2vaFPxdl2LtSVfGM1ckLc7nKl7E0e32Or3yKtk/xI2G/zsJBuqZD99xoQ2/mlzlDLmKcjEFyhzS7RVFInleQeTB+uBP2lFua1uwoi/N6J0wXWI+9E7+Tuu89D3NMTDEza9KAz//RKFqVGsOjzvv8x8EzljY3vmDglC4kjQjbd6fp+3VUmQgB+NwUPnN/n/hbhDZ27Q35oLp/xAl9/eiFaCO5dgvJ48NS4jQMNQTnM7RJilAQLuRo9+iCsY0u+PjbCjXB/TIyE/hqEkjOKKwyTWpscMkL9mrqUHP0ZTkoLE+QGkQWbTueBy27X6BB+F9LocOwNX4eAbROKP8dFlbKbBbWXdEy04mTBCwqjAJeF3I6kvCmo2URP55Jn0v4eex8gZxJcHnuAtmz0jD3kjHJdAwuJAcIaxiHEQc6gQ/b+XvmBNIxLuP8M+2ON+76NnrvKumV/z5uW0AyUHA=
+    on:
+      tags: true
+      repo: james-lim/coin-verse
+      branch: master
+  - provider: releases
+    prerelease: true
+    api_key:
+      secure: dr8ChsYYvTQRNVhVu2uv44yoS0woKi6HXvCo0VhVrdS86YqQ0PRcdfwUz8mQrG3OuJUUMe1fJjZmZQ/1m30g5b6fmnIoyk2cURdN1ntzE+0cRMv2kO94RJvGw8RFeAFJvCzOUDXYFneBrcqWfltAMeEck1LKbKlzB83stqBg3urw4u9Im/fD6w2IM3m903gTFj4naqJm3myQCFCYz3uOWTSe/fCU2vaFPxdl2LtSVfGM1ckLc7nKl7E0e32Or3yKtk/xI2G/zsJBuqZD99xoQ2/mlzlDLmKcjEFyhzS7RVFInleQeTB+uBP2lFua1uwoi/N6J0wXWI+9E7+Tuu89D3NMTDEza9KAz//RKFqVGsOjzvv8x8EzljY3vmDglC4kjQjbd6fp+3VUmQgB+NwUPnN/n/hbhDZ27Q35oLp/xAl9/eiFaCO5dgvJ48NS4jQMNQTnM7RJilAQLuRo9+iCsY0u+PjbCjXB/TIyE/hqEkjOKKwyTWpscMkL9mrqUHP0ZTkoLE+QGkQWbTueBy27X6BB+F9LocOwNX4eAbROKP8dFlbKbBbWXdEy04mTBCwqjAJeF3I6kvCmo2URP55Jn0v4eex8gZxJcHnuAtmz0jD3kjHJdAwuJAcIaxiHEQc6gQ/b+XvmBNIxLuP8M+2ON+76NnrvKumV/z5uW0AyUHA=
+    on:
+      tags: true
+      repo: james-lim/coin-verse
+      branch: develop

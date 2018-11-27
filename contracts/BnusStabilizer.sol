@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 import "bancor-contracts/solidity/contracts/utility/TokenHolder.sol";
 
-contract CnusStabilizer is TokenHolder {
+contract BnusStabilizer is TokenHolder {
     // TODO reserve cnus (1. 50% of the total cnus will be allocated as an initial state. 2. service fee will be reserved)
 
     // Booster

@@ -1,7 +1,6 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
-contract Cnus {
-    constructor(){
+import "bancor-contracts/solidity/contracts/token/interfaces/IERC20Token.sol";
 
-    }
+contract Cnus is IERC20Token{
 }

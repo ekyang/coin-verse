@@ -1,7 +1,8 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
-contract CoinVerse {
-    constructor (){
+import "bancor-contracts/solidity/contracts/BancorNetwork.sol";
 
-    }
+contract CoinVerse is BancorNetwork{
+    // TODO Manage services
 }
+

@@ -39,14 +39,14 @@ contract IBnusConverter {
         @param _depositAmount amount of Cnus to deposit
         @return expected purchase return amount of Bnus and conversion fee
     */
-    function getPurchaseReturn(IERC20Token _connectorToken, uint256 _depositAmount) public view returns (uint256, uint256);
+    function getPurchaseReturn(uint256 _depositAmount) public view returns (uint256, uint256);
 
     /**
         @dev returns the expected return for selling Bnus
         @param _sellAmount amount of Bnus to sell
         @return expected sale return amount of Cnus and conversion fee
     */
-    function getSaleReturn(IERC20Token _connectorToken, uint256 _sellAmount) public view returns (uint256, uint256);
+    function getSaleReturn(uint256 _sellAmount) public view returns (uint256, uint256);
 
     /**
       @dev returns available amount of Bnus by the daily quota for each user and the total supply

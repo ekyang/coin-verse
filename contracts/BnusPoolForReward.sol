@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import "bancor-contracts/solidity/contracts/utility/TokenHolder.sol";
 
-contract BnusRewardPool is TokenHolder {
+contract BnusPoolForReward is TokenHolder {
 
     // TODO reserve initial issued bnus
     // TODO airdrop (by admin)

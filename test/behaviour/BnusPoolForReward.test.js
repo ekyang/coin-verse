@@ -12,10 +12,10 @@ contract('BnusPoolForReward', async () => {
   // TODO BnusStabilizer naming
   context('When it receives token', async () => {
     // TODO Do we treat the fund differently according to where it is from?
-    it('can be from an EOA or from BnusStabilizer or from CoinVerseService', async () => {})
+    it('can be from an EOA or from Stabilizer or from CoinVerseService', async () => {})
     // TODO Decide allocation rule (guild?)
     it('should allocate received tokens to Bnus holders', async () => {})
-    // TODO We should make sure that we will use claim based model or another thing
+    // TODO We should make sure that we will use claim baed model or another thing
     it('should transfer holding Bnus when a user claims the allocated reward', async () => {})
   })
 

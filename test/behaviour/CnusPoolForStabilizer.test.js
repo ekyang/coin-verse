@@ -16,7 +16,7 @@ contract('CnusPoolForStabilizer', async () => {
 
     })
     it('administrator can adjust the reward amount', async () => {
-      it('should be less than limit', async () => {})
+      it('should be less than max limit(10,000?)', async () => {})
     })
     it('should start with 1000 cnus', async () => {
 
@@ -29,7 +29,7 @@ contract('CnusPoolForStabilizer', async () => {
 
   context('When Bnus selling occurs and the price touches the lower bound', async () => {
     it('should buy Bnus to guarantee the lower bound', async () => {})
-    it('should send the purchased Bnus to the BnusRewardPool', async () => {})
+    it('should send the purchased Bnus to the BnusPoolForReward', async () => {})
   })
 
   context('When it spends all the reserved fund', async () => {})

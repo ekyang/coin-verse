@@ -11,6 +11,7 @@ contract('BnusToken', async () => {
   // In addition, it has following extra behaviours
   context('When it is purchased from the CoinVerse', async () => {
     it('should not be transferable between EOAs', async () => {})
+    it('should be transferable only to the addresses in the whitelist', async () => {})
     it('should have its own guild id', async () => {}) // TODO Don't we need more use case of the guild id not only for the reward game
   })
 })

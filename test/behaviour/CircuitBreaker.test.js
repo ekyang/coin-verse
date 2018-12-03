@@ -8,5 +8,5 @@ contract('CircuitBreaker', async () => {
   it('should have 100,000 Cnus as its upper bound for the first week')
   it('should have 400,000 Cnus as its upper bound from its second week')
   it('should have -50% of total supply of Cnus as its lower bound')
-  it('should have new equation after 200 days to make the price increase rate as 0.5% per day')
+  it('should have new equation after 200 days to make cnus input upper bound increase as 0.5% per day')
 })

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-contract BnusPoolForReward {
+contract BnusPoolForRewardFace {
     /**
         @dev returns total deposited amount of Bnus
     */

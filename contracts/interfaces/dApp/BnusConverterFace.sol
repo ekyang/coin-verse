@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-contract IBnusConverter {
+contract BnusConverterFace {
     event Conversion(
         address indexed _fromToken,
         address indexed _toToken,

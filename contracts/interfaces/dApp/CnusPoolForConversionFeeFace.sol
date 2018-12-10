@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-contract CnusPoolForConversionFee {
+contract CnusPoolForConversionFeeFace {
     /**
         @dev returns total deposited amount of Bnus
     */

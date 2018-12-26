@@ -19,5 +19,7 @@ contract CnusPoolForStakingFace {
     /**
         @dev returns total amount of staked Cnus
     */
-    function getMyStakes() public view returns (uint256);
+    function getStakedAmount() public view returns (uint256);
+
+    function stakeOf(address _account) public view returns (uint256);
 }

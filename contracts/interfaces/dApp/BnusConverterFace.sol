@@ -23,12 +23,6 @@ contract BnusConverterFace {
     event ConversionsEnable(bool _conversionsEnabled);
 
     /**
-       @dev Return current status of converter
-       @return 0: Normal status / 1: Circuit breaker is working / 2: Stabilizer is working
-    */
-    function getCurrentStatus() public view returns (uint8);
-
-    /**
         @dev returns the Cnus balance stored in the bancor
         @return balance
     */
@@ -49,18 +43,16 @@ contract BnusConverterFace {
     function getSaleReturn(uint256 _sellAmount) public view returns (uint256, uint256);
 
     /**
-      @dev returns available amount of Bnus by the daily quota for each user and the total supply
-      @return available amount of Bnus
+       @dev buys Bnus
+       @param _amount  amount to increase the supply by (in Bnus token)
     */
-    function getAvailablePurchase() public view returns (uint256);
+    function fund(uint256 _amount) public;
 
     /**
        @dev buys Bnus
-       @param _amount  amount to increase the supply by (in Bnus token)
-       @param _udid  unique Device Id to prevent abusing
-       @param _signature signed udid with the private key of CoinUs wallet
+       @param _amount  amount of Cnus to buy Bnus
     */
-    function fund(uint256 _amount, bytes _udid, bytes _signature) public;
+    function buyBnus(uint256 _amount) public;
 
     /**
        @dev sells Bnus

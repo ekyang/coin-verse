@@ -12,6 +12,15 @@ contract CnusPoolForNewtorkRewardFace {
     */
     function airdrop(address _to, uint256 _amount) public;
 
+    /**
+      @dev Batch job for airdrop
+      can only be called by the owner
+
+      @param _to      array of account to receive the new amount
+      @param _amount  array of amount to withdraw
+    */
+    function batchAirdrop(address[] _to, uint256[] _amount) public;
+
     function getTotalBalance() public view returns (uint256);
 
     function owner() public view returns (address) {}

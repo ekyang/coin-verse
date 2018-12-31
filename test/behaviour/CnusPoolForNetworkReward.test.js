@@ -1,36 +1,37 @@
 const { Contract, Protocol } = require('../protocol/Bancor')
 
 const CnusPoolForNetworkReward = artifacts.require('CnusPoolForNetworkReward.sol')
+const { Contract, Protocol } = require('../protocol/Bancor')
 
 contract('CnusPoolForNetworkReward', async () => {
   // Basically, it should pass all test cases of the bancor protocol.
-  it('should follow the bancor protocol', async () => {
-    Contract(CnusPoolForNetworkReward).follows(Protocol.TokenHolder)
-  })
-
-  context('When it meets the condition', async () => {
-    it('should allow every user to execute stabilize() function', async () => {
-
-    })
-    it('should provide fixed amount of rewards to the stabilize() executor', async () => {
-
-    })
-    it('administrator can adjust the reward amount', async () => {
-      it('should be less than max limit(10,000?)', async () => {})
-    })
-    it('should start with 1000 cnus', async () => {
-
+  context('It follows the bancor protocol', async () => {
+    it('should follow the bancor protocol', async () => {
+      Contract(CnusPoolForNetworkReward).follows(Protocol.TokenHolder)
     })
   })
-  // In addition, it has following extra behaviours
-  context('When it is deployed', async () => {
-    it('should start after it receives (1billion - 1million) of total Cnus as its initial fund', async () => {})
+
+  context('It has customized features', async () => {
+    describe('Events', async () => {
+      it('should emit Airdrop event when the admin proceeded airdrops', async () => {})
+    })
   })
 
-  context('When Bnus selling occurs and the price touches the lower bound', async () => {
-    it('should buy Bnus to guarantee the lower bound', async () => {})
-    it('should send the purchased Bnus to the BnusPoolForReward', async () => {})
+  describe('Getters', async () => {
+    describe('getBalance()', async () => {
+      it('should return the amount of Cnus the contract is holding', async () => {})
+    })
   })
 
-  context('When it spends all the reserved fund', async () => {})
+  describe('TxFunctions', async () => {
+    describe('airdrop()', async () => {
+      it('should withdraw cnus tokens held by the contract and send them to the designated account', async () => {})
+      it('should allow only the owner to call', async () => {})
+    })
+    describe('batchAirdrop()', async () => {
+      it('should withdraw cnus tokens held by the contract and send them to the designated accounts', async () => {})
+      it('should allow only the owner to call', async () => {})
+    })
+  })
 })
+

@@ -1,7 +1,6 @@
 const { Contract, Protocol } = require('../protocol/Bancor')
 
 const CnusPoolForNetworkReward = artifacts.require('CnusPoolForNetworkReward.sol')
-const { Contract, Protocol } = require('../protocol/Bancor')
 
 contract('CnusPoolForNetworkReward', async () => {
   // Basically, it should pass all test cases of the bancor protocol.

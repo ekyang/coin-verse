@@ -76,7 +76,7 @@ contract('BnusConverter', async (accounts) => {
     }
 
     let initConverter = async () => {
-      bnusToken = await BnusToken.new()
+      bnusToken = await BnusToken.new('CoinUs', 'BNUS', 18)
       cnusToken = await CnusTokenMockup.new()
 
       let bnusTokenId = await contractIds.BNUS_TOKEN.call()

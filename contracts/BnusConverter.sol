@@ -12,8 +12,9 @@ import 'bancor-contracts/solidity/contracts/utility/interfaces/IContractFeatures
 import 'bancor-contracts/solidity/contracts/token/SmartTokenController.sol';
 import 'bancor-contracts/solidity/contracts/token/interfaces/ISmartToken.sol';
 import 'bancor-contracts/solidity/contracts/token/interfaces/IEtherToken.sol';
-import "./CoinVerseContractIds.sol";
 import "bancor-contracts/solidity/contracts/converter/interfaces/IBancorGasPriceLimit.sol";
+import "./CoinVerseContractIds.sol";
+import "./interfaces/IBnusConverter.sol";
 
 /*
     Bancor Converter v0.11
@@ -37,7 +38,7 @@ import "bancor-contracts/solidity/contracts/converter/interfaces/IBancorGasPrice
     - Possibly add getters for the connector fields so that the client won't need to rely on the order in the struct
 */
 
-contract BnusConverter is IBancorConverter, SmartTokenController, Managed, CoinVerseContractIds, FeatureIds {
+contract BnusConverter is IBnusConverter, IBancorConverter, SmartTokenController, Managed, CoinVerseContractIds, FeatureIds {
     //TODO Take Cnus as conversion fee => Cnus reward pool(Bnus holder will be rewarded)
     //    function convert(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256) {
     //
@@ -728,7 +729,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, CoinV
         // issue new funds to the caller in the smart token
         token.issue(msg.sender, amount);
         // send conversion fee to the network reward fee
-        token.issue(registry.addressOf(BNUS_POOL_FOR_NETWORK_REWARD), feeAmount);
+        token.issue(registry.addressOf(TOKEN_POOL), feeAmount);
 
         // dispatch the conversion event
         dispatchConversionEvent(_connectorToken, token, _depositAmount, amount, feeAmount);
@@ -772,7 +773,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, CoinV
         // the transfer might fail if the actual connector balance is smaller than the virtual balance
         assert(_connectorToken.transfer(msg.sender, amount));
         // send conversion fee to the marketing pool
-        assert(_connectorToken.transfer(registry.addressOf(CNUS_POOL_FOR_MARKETING), feeAmount));
+        assert(_connectorToken.transfer(registry.addressOf(TOKEN_POOL), feeAmount));
 
         // dispatch the conversion event
         dispatchConversionEvent(token, _connectorToken, _sellAmount, amount, feeAmount);

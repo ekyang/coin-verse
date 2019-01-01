@@ -15,7 +15,7 @@ const bancorConverterTestCase = (artifact) => {
   const fs = require('fs')
   const path = require('path')
   const BancorNetwork = artifacts.require('BancorNetwork.sol')
-  const ContractIds = artifacts.require('ContractIds.sol')
+  const ContractIds = artifacts.require('CoinVerseContractIds.sol')
   // const BancorConverter = artifacts.require('BancorConverter.sol')
   const BancorConverter = artifact
   const SmartToken = artifacts.require('SmartToken.sol')
@@ -26,6 +26,8 @@ const bancorConverterTestCase = (artifact) => {
   const TestERC20Token = artifacts.require('TestERC20Token.sol')
   const BancorConverterFactory = artifacts.require('BancorConverterFactory.sol')
   const BancorConverterUpgrader = artifacts.require('BancorConverterUpgrader.sol')
+  const BnusPoolForNetworkReward = artifacts.require('BnusPoolForNetworkReward.sol')
+  const CnusPoolForMarketing = artifacts.require('CnusPoolForMarketing.sol')
   const utils = require('./helpers/Utils')
 
   const weight10Percent = 100000
@@ -125,6 +127,14 @@ const bancorConverterTestCase = (artifact) => {
       connectorToken = await TestERC20Token.new('ERC Token 1', 'ERC1', 1000000000)
       connectorToken2 = await TestERC20Token.new('ERC Token 2', 'ERC2', 2000000000)
       connectorToken3 = await TestERC20Token.new('ERC Token 3', 'ERC2', 1500000000)
+
+      let bnusPoolForNetworkReward = await BnusPoolForNetworkReward.new()
+      let bnusPoolForNetworkRewardId = await contractIds.BNUS_POOL_FOR_NETWORK_REWARD.call()
+      await contractRegistry.registerAddress(bnusPoolForNetworkRewardId, bnusPoolForNetworkReward.address)
+
+      let cnusPoolForMarketing = await CnusPoolForMarketing.new()
+      let cnusPoolForMarketingId = await contractIds.CNUS_POOL_FOR_MARKETING.call()
+      await contractRegistry.registerAddress(cnusPoolForMarketingId, cnusPoolForMarketing.address)
     })
 
     it('verifies the converter data after construction', async () => {

@@ -4,7 +4,6 @@ import 'bancor-contracts/solidity/contracts/converter/interfaces/IBancorConverte
 import 'bancor-contracts/solidity/contracts/converter/interfaces/IBancorConverterUpgrader.sol';
 import 'bancor-contracts/solidity/contracts/converter/interfaces/IBancorFormula.sol';
 import 'bancor-contracts/solidity/contracts/IBancorNetwork.sol';
-import 'bancor-contracts/solidity/contracts/ContractIds.sol';
 import 'bancor-contracts/solidity/contracts/FeatureIds.sol';
 import 'bancor-contracts/solidity/contracts/utility/Managed.sol';
 import 'bancor-contracts/solidity/contracts/utility/Utils.sol';
@@ -13,6 +12,8 @@ import 'bancor-contracts/solidity/contracts/utility/interfaces/IContractFeatures
 import 'bancor-contracts/solidity/contracts/token/SmartTokenController.sol';
 import 'bancor-contracts/solidity/contracts/token/interfaces/ISmartToken.sol';
 import 'bancor-contracts/solidity/contracts/token/interfaces/IEtherToken.sol';
+import "./CoinVerseContractIds.sol";
+import "bancor-contracts/solidity/contracts/converter/interfaces/IBancorGasPriceLimit.sol";
 
 /*
     Bancor Converter v0.11
@@ -36,7 +37,7 @@ import 'bancor-contracts/solidity/contracts/token/interfaces/IEtherToken.sol';
     - Possibly add getters for the connector fields so that the client won't need to rely on the order in the struct
 */
 
-contract BnusConverter is IBancorConverter, SmartTokenController, Managed, ContractIds, FeatureIds {
+contract BnusConverter is IBancorConverter, SmartTokenController, Managed, CoinVerseContractIds, FeatureIds {
     //TODO Take Cnus as conversion fee => Cnus reward pool(Bnus holder will be rewarded)
     //    function convert(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256) {
     //
@@ -116,7 +117,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
     {
         registry = _registry;
         prevRegistry = _registry;
-        IContractFeatures features = IContractFeatures(registry.addressOf(ContractIds.CONTRACT_FEATURES));
+        IContractFeatures features = IContractFeatures(registry.addressOf(CONTRACT_FEATURES));
 
         // initialize supported features
         if (features != address(0))
@@ -126,6 +127,13 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
 
         if (_connectorToken != address(0))
             addConnector(_connectorToken, _connectorWeight, false);
+    }
+
+    // prevent front running with gas limitation
+    modifier preventFrontRunning() {
+        IBancorGasPriceLimit gasPriceLimit = IBancorGasPriceLimit(registry.addressOf(BANCOR_GAS_PRICE_LIMIT));
+        gasPriceLimit.validateGasPrice(tx.gasprice);
+        _;
     }
 
     // validates a connector token address - verifies that the address belongs to one of the connector tokens
@@ -178,14 +186,14 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
 
     // allows execution by the BancorNetwork contract only
     modifier bancorNetworkOnly {
-        IBancorNetwork bancorNetwork = IBancorNetwork(registry.addressOf(ContractIds.BANCOR_NETWORK));
+        IBancorNetwork bancorNetwork = IBancorNetwork(registry.addressOf(BANCOR_NETWORK));
         require(msg.sender == address(bancorNetwork));
         _;
     }
 
     // allows execution by the converter upgrader contract only
     modifier converterUpgraderOnly {
-        address converterUpgrader = registry.addressOf(ContractIds.BANCOR_CONVERTER_UPGRADER);
+        address converterUpgrader = registry.addressOf(BANCOR_CONVERTER_UPGRADER);
         require(owner == converterUpgrader);
         _;
     }
@@ -197,6 +205,33 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
     }
 
     /**
+    * @dev Customized function for Coin Verse system
+    * @param _depositAmount amount of Cnus to buy Bnus
+    * @param _minReturn expected minimum return of Bnus. It is cancelled when the returned amount of Bnus is smaller
+     than the _minReturn,
+    */
+    function buyBnus(uint256 _depositAmount, uint256 _minReturn)
+    public
+    preventFrontRunning
+    returns (uint256) {
+        return buy(IERC20Token(registry.addressOf(CNUS_TOKEN)), _depositAmount, _minReturn);
+    }
+
+    /**
+     * @dev Customized function for Coin Verse system
+     * @param _sellAmount amount of Cnus to buy Bnus
+     * @param _minReturn expected minimum return of Bnus. It is cancelled when the returned amount of Bnus is smaller
+      than the _minReturn,
+     */
+    function sellBnus(uint256 _sellAmount, uint256 _minReturn)
+    public
+    preventFrontRunning
+    returns (uint256){
+        return sell(IERC20Token(registry.addressOf(CNUS_TOKEN)), _sellAmount, _minReturn);
+    }
+
+
+    /**
         @dev sets the contract registry to whichever address the current registry is pointing to
      */
     function updateRegistry() public {
@@ -204,7 +239,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         require(allowRegistryUpdate || msg.sender == owner);
 
         // get the address of whichever registry the current registry is pointing to
-        address newRegistry = registry.addressOf(ContractIds.CONTRACT_REGISTRY);
+        address newRegistry = registry.addressOf(CONTRACT_REGISTRY);
 
         // if the new registry hasn't changed or is the zero address, revert
         require(newRegistry != address(registry) && newRegistry != address(0));
@@ -338,7 +373,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         @param _amount  amount to withdraw
     */
     function withdrawTokens(IERC20Token _token, address _to, uint256 _amount) public {
-        address converterUpgrader = registry.addressOf(ContractIds.BANCOR_CONVERTER_UPGRADER);
+        address converterUpgrader = registry.addressOf(BANCOR_CONVERTER_UPGRADER);
 
         // if the token is not a connector token, allow withdrawal
         // otherwise verify that the converter is inactive or that the owner is the upgrader contract
@@ -354,7 +389,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         @param _amount    the amount to claim
      */
     function claimTokens(address _from, uint256 _amount) public whenClaimTokensEnabled {
-        address bancorX = registry.addressOf(ContractIds.BANCOR_X);
+        address bancorX = registry.addressOf(BANCOR_X);
 
         // only the bancorX contract may call this method
         require(msg.sender == bancorX);
@@ -370,7 +405,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         note that the owner needs to call acceptOwnership on the new converter after the upgrade
     */
     function upgrade() public ownerOnly {
-        IBancorConverterUpgrader converterUpgrader = IBancorConverterUpgrader(registry.addressOf(ContractIds.BANCOR_CONVERTER_UPGRADER));
+        IBancorConverterUpgrader converterUpgrader = IBancorConverterUpgrader(registry.addressOf(BANCOR_CONVERTER_UPGRADER));
 
         transferOwnership(converterUpgrader);
         converterUpgrader.upgrade(version);
@@ -445,7 +480,17 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
     {
         connectors[_connectorToken].isPurchaseEnabled = !_disable;
     }
-
+    /**
+        @dev returns balance of Cnus
+        @return connector balance
+    */
+    function getCnusBalance()
+    public
+    view
+    returns (uint256)
+    {
+        return getConnectorBalance(IERC20Token(registry.addressOf(CNUS_TOKEN)));
+    }
     /**
         @dev returns the connector's virtual balance if one is defined, otherwise returns the actual balance
 
@@ -507,7 +552,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
 
         uint256 tokenSupply = token.totalSupply();
         uint256 connectorBalance = getConnectorBalance(_connectorToken);
-        IBancorFormula formula = IBancorFormula(registry.addressOf(ContractIds.BANCOR_FORMULA));
+        IBancorFormula formula = IBancorFormula(registry.addressOf(BANCOR_FORMULA));
         uint256 amount = formula.calculatePurchaseReturn(tokenSupply, connectorBalance, connector.weight, _depositAmount);
         uint256 finalAmount = getFinalAmount(amount, 1);
 
@@ -533,7 +578,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         Connector storage connector = connectors[_connectorToken];
         uint256 tokenSupply = token.totalSupply();
         uint256 connectorBalance = getConnectorBalance(_connectorToken);
-        IBancorFormula formula = IBancorFormula(registry.addressOf(ContractIds.BANCOR_FORMULA));
+        IBancorFormula formula = IBancorFormula(registry.addressOf(BANCOR_FORMULA));
         uint256 amount = formula.calculateSaleReturn(tokenSupply, connectorBalance, connector.weight, _sellAmount);
         uint256 finalAmount = getFinalAmount(amount, 1);
 
@@ -563,7 +608,7 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         require(toConnector.isPurchaseEnabled);
         // validate input
 
-        IBancorFormula formula = IBancorFormula(registry.addressOf(ContractIds.BANCOR_FORMULA));
+        IBancorFormula formula = IBancorFormula(registry.addressOf(BANCOR_FORMULA));
         uint256 amount = formula.calculateCrossConnectorReturn(
             getConnectorBalance(_fromConnectorToken),
             fromConnector.weight,
@@ -651,7 +696,8 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
 
         @return conversion return amount
     */
-    function convert(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256) {
+    function convert(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256)
+    {
         convertPath = [_fromToken, token, _toToken];
         return quickConvert(convertPath, _amount, _minReturn);
     }
@@ -681,6 +727,8 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         assert(_connectorToken.transferFrom(msg.sender, this, _depositAmount));
         // issue new funds to the caller in the smart token
         token.issue(msg.sender, amount);
+        // send conversion fee to the network reward fee
+        token.issue(registry.addressOf(BNUS_POOL_FOR_NETWORK_REWARD), feeAmount);
 
         // dispatch the conversion event
         dispatchConversionEvent(_connectorToken, token, _depositAmount, amount, feeAmount);
@@ -723,6 +771,8 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
         // transfer funds to the caller in the connector token
         // the transfer might fail if the actual connector balance is smaller than the virtual balance
         assert(_connectorToken.transfer(msg.sender, amount));
+        // send conversion fee to the marketing pool
+        assert(_connectorToken.transfer(registry.addressOf(CNUS_POOL_FOR_MARKETING), feeAmount));
 
         // dispatch the conversion event
         dispatchConversionEvent(token, _connectorToken, _sellAmount, amount, feeAmount);
@@ -768,11 +818,12 @@ contract BnusConverter is IBancorConverter, SmartTokenController, Managed, Contr
     function quickConvertPrioritized(IERC20Token[] _path, uint256 _amount, uint256 _minReturn, uint256 _block, uint8 _v, bytes32 _r, bytes32 _s)
     public
     payable
+    preventFrontRunning
     validConversionPath(_path)
     returns (uint256)
     {
         IERC20Token fromToken = _path[0];
-        IBancorNetwork bancorNetwork = IBancorNetwork(registry.addressOf(ContractIds.BANCOR_NETWORK));
+        IBancorNetwork bancorNetwork = IBancorNetwork(registry.addressOf(BANCOR_NETWORK));
 
         // we need to transfer the source tokens from the caller to the BancorNetwork contract,
         // so it can execute the conversion on behalf of the caller

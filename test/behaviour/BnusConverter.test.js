@@ -4,6 +4,7 @@ const BigNumber = web3.BigNumber
 const should = chai.use(require('chai-bignumber')(BigNumber)).should()
 const { Contract, Protocol } = require('../protocol/Bancor')
 const { deployContracts, initConverter } = require('../helper')
+const BnusConverter = artifacts.require('BnusConverter.sol')
 
 contract('BnusConverter', async (accounts) => {
   // Basically, it should pass all test cases of the bancor protocol.

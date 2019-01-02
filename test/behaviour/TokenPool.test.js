@@ -2,21 +2,11 @@ const chai = require('chai')
 const assert = chai.assert
 const BigNumber = web3.BigNumber
 const should = chai.use(require('chai-bignumber')(BigNumber)).should()
-const BnusToken = artifacts.require('BnusToken.sol')
-const BnusConverter = artifacts.require('BnusConverter.sol')
-const BancorFormula = artifacts.require('BancorFormula.sol')
-const BancorNetwork = artifacts.require('BancorNetwork.sol')
-const BancorGasPriceLimit = artifacts.require('BancorGasPriceLimit.sol')
-const BancorConverterFactory = artifacts.require('BancorConverterFactory.sol')
-const BancorConverterUpgrader = artifacts.require('BancorConverterUpgrader.sol')
-const TokenPool = artifacts.require('TokenPool.sol')
-const CnusTokenMockup = artifacts.require('CnusTokenMockup.sol')
-const CoinVerseContractIds = artifacts.require('CoinVerseContractIds.sol')
-const ContractFeatures = artifacts.require('ContractFeatures.sol')
-const ContractRegistry = artifacts.require('ContractRegistry.sol')
 const { Contract, Protocol } = require('../protocol/Bancor')
+const { deployContracts, initConverter } = require('../helper')
+const TokenPool = artifacts.require('TokenPool.sol')
 
-contract('TokenPool', async () => {
+contract('TokenPool', async (accounts) => {
   // Basically, it should pass all test cases of the bancor protocol.
   context('It follows the bancor protocol', async () => {
     it('should follow the bancor protocol', async () => {
@@ -24,6 +14,19 @@ contract('TokenPool', async () => {
     })
   })
   context('It has customized features', async () => {
+    let contracts
+    before(async () => {
+      contracts = await deployContracts(artifacts, accounts)
+    })
+
+    let converter
+    let bnusToken
+    let cnusToken
+    let tokenPool
+    beforeEach(async () => {
+      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, accounts, contracts)
+    })
+
     describe('Events', async () => {
       it('should emit Airdrop event when the admin proceeded airdrops', async () => {})
     })
@@ -33,11 +36,27 @@ contract('TokenPool', async () => {
       })
     })
     describe('TxFunctions', async () => {
-      describe('airdrop()', async () => {
+      describe('airdropCnus()', async () => {
         it('should withdraw cnus tokens held by the contract and send them to the designated account', async () => {})
         it('should allow only the owner to call', async () => {})
       })
-      describe('batchAirdrop()', async () => {
+      describe('airdropBnus()', async () => {
+        it('should withdraw cnus tokens held by the contract and send them to the designated account', async () => {})
+        it('should allow only the owner to call', async () => {})
+      })
+      describe('batchAirdropCnus()', async () => {
+        it('should withdraw cnus tokens held by the contract and send them to the designated accounts', async () => {})
+        it('should allow only the owner to call', async () => {})
+      })
+      describe('batchAirdropBnus()', async () => {
+        it('should withdraw cnus tokens held by the contract and send them to the designated accounts', async () => {})
+        it('should allow only the owner to call', async () => {})
+      })
+      describe('bnusToCnus()', async () => {
+        it('should withdraw cnus tokens held by the contract and send them to the designated accounts', async () => {})
+        it('should allow only the owner to call', async () => {})
+      })
+      describe('cnusToBnus()', async () => {
         it('should withdraw cnus tokens held by the contract and send them to the designated accounts', async () => {})
         it('should allow only the owner to call', async () => {})
       })

@@ -42,7 +42,8 @@ module.exports = {
     let bancorConverterUpgraderId = await contractIds.BANCOR_CONVERTER_UPGRADER.call()
     await contractRegistry.registerAddress(bancorConverterUpgraderId, upgrader.address)
 
-    tokenPool = await TokenPool.new(contractRegistry.address)
+    tokenPool = await TokenPool.new()
+    await tokenPool.setRegistry(contractRegistry.address)
     let tokenPoolId = await contractIds.TOKEN_POOL.call()
     await contractRegistry.registerAddress(tokenPoolId, tokenPool.address)
 

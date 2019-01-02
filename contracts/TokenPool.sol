@@ -11,7 +11,11 @@ contract TokenPool is ITokenPool, TokenHolder, CoinVerseContractIds {
 
     IContractRegistry registry;
 
-    constructor (address _registry) public {
+    constructor () public {
+
+    }
+
+    function setRegistry(address _registry) ownerOnly {
         registry = IContractRegistry(_registry);
     }
 

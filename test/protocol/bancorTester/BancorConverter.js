@@ -15,7 +15,7 @@ const bancorConverterTestCase = (artifact) => {
   const fs = require('fs')
   const path = require('path')
   const BancorNetwork = artifacts.require('BancorNetwork.sol')
-  const ContractIds = artifacts.require('CoinVerseContractIds.sol')
+  const ContractIds = artifacts.require('ContractIds.sol')
   // const BancorConverter = artifacts.require('BancorConverter.sol')
   const BancorConverter = artifact
   const SmartToken = artifacts.require('SmartToken.sol')
@@ -126,10 +126,6 @@ const bancorConverterTestCase = (artifact) => {
       connectorToken = await TestERC20Token.new('ERC Token 1', 'ERC1', 1000000000)
       connectorToken2 = await TestERC20Token.new('ERC Token 2', 'ERC2', 2000000000)
       connectorToken3 = await TestERC20Token.new('ERC Token 3', 'ERC2', 1500000000)
-
-      let tokenPool = await TokenPool.new()
-      let tokenPoolId = await contractIds.TOKEN_POOL.call()
-      await contractRegistry.registerAddress(tokenPoolId, tokenPool.address)
     })
 
     it('verifies the converter data after construction', async () => {

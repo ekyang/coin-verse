@@ -74,4 +74,34 @@ contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds 
     {
         return getConnectorBalance(IERC20Token(registry.addressOf(CNUS_TOKEN)));
     }
+
+    /**
+     * @dev returns expected amount of Bnus for the given Cnus
+     */
+    function getExpectedBnus(uint256 _cnus)
+    public
+    view
+    returns (uint256)
+    {
+        uint256 amount;
+        uint256 feeAmount;
+        IERC20Token cnus = IERC20Token(registry.addressOf(CNUS_TOKEN));
+        (amount, feeAmount) = getPurchaseReturn(cnus, _cnus);
+        return amount;
+    }
+
+    /**
+     * @dev returns expected amount of Cnus for the given Bnus
+     */
+    function getExpectedCnus(uint256 _bnus)
+    public
+    view
+    returns (uint256)
+    {
+        uint256 amount;
+        uint256 feeAmount;
+        IERC20Token cnus = IERC20Token(registry.addressOf(CNUS_TOKEN));
+        (amount, feeAmount) = getSaleReturn(cnus, _bnus);
+        return amount;
+    }
 }

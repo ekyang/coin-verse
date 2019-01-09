@@ -6,16 +6,19 @@ module.exports = {
     const BancorConverterFactory = artifacts.require('BancorConverterFactory.sol')
     const BancorConverterUpgrader = artifacts.require('BancorConverterUpgrader.sol')
     const TokenPool = artifacts.require('TokenPool.sol')
+    const ContractIds = artifacts.require('ContractIds.sol')
     const CoinVerseContractIds = artifacts.require('CoinVerseContractIds.sol')
     const ContractFeatures = artifacts.require('ContractFeatures.sol')
     const ContractRegistry = artifacts.require('ContractRegistry.sol')
     let contractRegistry
     let contractIds
+    let coinVerseContractIds
     let contractFeatures
     let upgrader
     let tokenPool
     contractRegistry = await ContractRegistry.new()
-    contractIds = await CoinVerseContractIds.new()
+    contractIds = await ContractIds.new()
+    coinVerseContractIds = await CoinVerseContractIds.new()
 
     contractFeatures = await ContractFeatures.new()
     let contractFeaturesId = await contractIds.CONTRACT_FEATURES.call()
@@ -44,12 +47,13 @@ module.exports = {
 
     tokenPool = await TokenPool.new()
     await tokenPool.setRegistry(contractRegistry.address)
-    let tokenPoolId = await contractIds.TOKEN_POOL.call()
+    let tokenPoolId = await coinVerseContractIds.TOKEN_POOL.call()
     await contractRegistry.registerAddress(tokenPoolId, tokenPool.address)
 
     return {
       contractRegistry,
       contractIds,
+      coinVerseContractIds,
       contractFeatures,
       upgrader,
       tokenPool
@@ -63,8 +67,8 @@ module.exports = {
     let bnusToken = await BnusToken.new('CoinUs', 'BNUS', 18)
     let cnusToken = await CnusTokenMockup.new()
 
-    let bnusTokenId = await contracts.contractIds.BNUS_TOKEN.call()
-    let cnusTokenId = await contracts.contractIds.CNUS_TOKEN.call()
+    let bnusTokenId = await contracts.coinVerseContractIds.BNUS_TOKEN.call()
+    let cnusTokenId = await contracts.coinVerseContractIds.CNUS_TOKEN.call()
     await contracts.contractRegistry.registerAddress(bnusTokenId, bnusToken.address)
     await contracts.contractRegistry.registerAddress(cnusTokenId, cnusToken.address)
 

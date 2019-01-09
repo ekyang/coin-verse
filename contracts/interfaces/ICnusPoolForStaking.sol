@@ -7,7 +7,7 @@ contract ICnusPoolForStaking {
        @param _udid  unique Device Id to prevent abusing
        @param _signature signed udid with the private key of CoinUs wallet
     */
-    function stake(uint256 _amount, bytes _udid, bytes _signature) public;
+    function stake(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature) public;
 
     /**
        @dev withdrawing for approved requests
@@ -15,7 +15,7 @@ contract ICnusPoolForStaking {
        @param _udid  unique Device Id to prevent abusing
        @param _signature signed udid with the private key of CoinUs wallet
     */
-    function withdraw(uint256 _amount, bytes _udid, bytes _signature) public;
+    function withdraw(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature) public;
 
     /**
         @dev returns total amount of staked Cnus

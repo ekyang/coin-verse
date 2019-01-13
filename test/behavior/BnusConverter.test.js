@@ -81,12 +81,28 @@ contract('BnusConverter', async (accounts) => {
           // Sell Bnus
           let sellAmount = 1000
           let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, sellAmount)
-          await bnusToken.approve(converter.address, sellAmount, { from: accounts[1] })
           await converter.sellBnus(sellAmount, expectedCnus, { from: accounts[1] })
 
           // Check updated balance
           let updatedBalance = await converter.getCnusBalance()
           updatedBalance.toNumber().should.equal(initialBalance.toNumber() - (expectedCnus.toNumber() + fee.toNumber()))
+        })
+        it('should be executable multiple times', async () => {
+          let sellBnus = async () => {
+            let initialBalance = await converter.getCnusBalance()
+
+            // Sell Bnus
+            let sellAmount = 1000
+            let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, sellAmount)
+            await converter.sellBnus(sellAmount, expectedCnus, { from: accounts[1] })
+
+            // Check updated balance
+            let updatedBalance = await converter.getCnusBalance()
+            updatedBalance.toNumber().should.equal(initialBalance.toNumber() - (expectedCnus.toNumber() + fee.toNumber()))
+          }
+          for (let i = 0; i < 5; i++) {
+            await sellBnus()
+          }
         })
         it('should send the conversion fee to the token pool instead of burning them', async () => {
           // Sell Bnus

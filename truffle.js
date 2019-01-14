@@ -18,6 +18,11 @@ module.exports = {
       network_id: '*',
       gasPrice: 1001
     },
+    mainnet: {
+      provider: () => new HDWalletProvider(process.env.MNENOMIC, 'https://mainnet.infura.io/v3/' + process.env.INFURA_API_KEY),
+      network_id: 1,
+      gasPrice: 1000000000
+    },
     ropsten: {
       provider: () => new HDWalletProvider(process.env.MNENOMIC, 'https://ropsten.infura.io/v3/' + process.env.INFURA_API_KEY),
       network_id: 3,

@@ -28,7 +28,7 @@ compile() {
 
 # Run private block-chain for test cases
 run_ganache() {
-  ganache-cli > /dev/null & pid=$!
+  ./node_modules/.bin/ganache-cli > /dev/null & pid=$!
   if ps -p $pid > /dev/null
   then
     echo "Running ganache..."

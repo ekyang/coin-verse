@@ -8,19 +8,20 @@ CoinUs dApp network
 
 | Contract                | Address                                      |
 | ----------------------- | -------------------------------------------- |
-| ContractRegistry        | `0x14cc9550b54ac0382a8cb37a6ee424bb1776bc84` |
-| CoinVerseContractIds    | `0x7ad341966836fe13401d240f1974373cf0e070ad` |
-| ContractIds             | `0x187edbece2cecfa3b4fae5c7918bbb9c4a97e46e` |
-| ContractFeatures        | `0x6cce96090e000e914cfe62ccf079f25f0a65a130` |
-| BancorFormula           | `0xd7b0a837fe961295295cdef2467848cc7cb7777f` |
-| BancorGasPriceLimit     | `0x539d29f7a27e8ea7b22c4648af682293ab3ba1a7` |
-| BancorConverterFactory  | `0x6ee4e4b4fd5380bc2fb85f416da73796ef040d44` |
-| BancorConverterUpgrader | `0x248164eba69dd716999fa496d7a9f727137154de` |
-| BancorNetwork           | `0x7d9790794452848edb317ab1221acb3c7c5d7e32` |
-| **TokenPool**           | `0x7358bf76407a8a9d57c790d882a0d73d2bacff34` |
-| **BnusToken**           | `0xfea8dcd38b76b3e047948c9af86d45d18ebfe144` |
-| CnusTokenMockUp         | `0x03f00eff0af3e49e9ec24ceb5f27e62e7ca18778` |
-| **BnusConverter**       | `0xaad81156fa442e704cee07e37d9e27d449ef9632` |
+| ContractRegistry        | `0xa15c31487152feb2b496771b5455ee859e08a593` |
+| CoinVerseContractIds    | `0x992943a8db682642401cf57efb797a0916ebf1a5` |
+| ContractIds             | `0x876c90da037a014427e2a3956cef79c053a8c35e` |
+| ContractFeatures        | `0x09b4c953cb0c3bd74efc03e695fbc988a87fdfb6` |
+| BancorFormula           | `0x61d69d9d9629a5a15c34646f501374b2a181adad` |
+| BancorGasPriceLimit     | `0x0d606b13ba659e9a5a85747d85fc25d031accbd9` |
+| BancorConverterFactory  | `0xa383b844d820e7c8febd0548e1ebd39bf0cd4430` |
+| BancorConverterUpgrader | `0xddfbb15f76ea7eb136fe62bf83eb28f7c802d73d` |
+| BancorNetwork           | `0x2cd3b7e5b6b79e3ddc6b6b16ea67a4e0716c6219` |
+| **TokenPool**               | `0x2b59167a65fc1a1eaeae2f791ed7c01aa8bfadeb` |
+| CnusPoolForStaking      | `0xf189ccfd1317af58329a0a0f6780f8f0224252ce` |
+| **BnusToken**               | `0xbeebff2ff8c2c1a2bbc61ffb88873195006631a7` |
+| CnusTokenMockUp         | `0xf0fc1aea203ac4f0fdb9a530c8773d8e0fe09595` |
+| **BnusConverter**           | `0xadec9a3fefa20f5e1275c911700fd6208c9ae0f3` |
 
 #### Mainnet
 
@@ -35,10 +36,11 @@ CoinUs dApp network
 | BancorConverterFactory  | `0x0000000000000000000000000000000000000000` |
 | BancorConverterUpgrader | `0x0000000000000000000000000000000000000000` |
 | BancorNetwork           | `0x0000000000000000000000000000000000000000` |
-| **TokenPool**           | `0x0000000000000000000000000000000000000000` |
-| **BnusToken**           | `0x0000000000000000000000000000000000000000` |
+| **TokenPool**               | `0x0000000000000000000000000000000000000000` |
+| CnusPoolForStaking      | `0x0000000000000000000000000000000000000000` |
+| **BnusToken**               | `0x0000000000000000000000000000000000000000` |
 | CnusTokenMockUp         | `0x0000000000000000000000000000000000000000` |
-| **BnusConverter**       | `0x0000000000000000000000000000000000000000` |
+| **BnusConverter**           | `0x0000000000000000000000000000000000000000` |
 
 
 ## Development status

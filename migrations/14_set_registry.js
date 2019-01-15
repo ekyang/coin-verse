@@ -13,6 +13,7 @@ const CnusTokenMockUp = artifacts.require('CnusTokenMockUp.sol')
 const CnusPoolForStaking = artifacts.require('CnusPoolForStaking.sol')
 
 module.exports = async function (deployer, network, accounts) {
+  if(network === 'development') return
   deployer.then(() => {
     return ContractRegistry.deployed()
   }).then(async (registry) => {

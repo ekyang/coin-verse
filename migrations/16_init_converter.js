@@ -5,6 +5,7 @@ const TokenPool = artifacts.require('TokenPool.sol')
 const assert = require('assert')
 
 module.exports = function (deployer, network, accounts) {
+  if(network === 'development') return
   deployer.then(() => {
     return BnusConverter.deployed()
   }).then(async (bnusConverter) => {

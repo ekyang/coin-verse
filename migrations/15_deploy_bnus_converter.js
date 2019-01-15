@@ -5,6 +5,7 @@ const ContractRegistry = artifacts.require('ContractRegistry.sol')
 const assert = require('assert')
 
 module.exports = async function (deployer, network, accounts) {
+  if(network === 'development') return
   deployer.then(() => {
     return ContractRegistry.deployed()
   }).then(async (registry) => {

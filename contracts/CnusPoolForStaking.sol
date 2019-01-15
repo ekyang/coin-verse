@@ -13,7 +13,7 @@ contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContra
 
 
     IContractRegistry registry;
-    address coinUsAccount;
+    address public coinUsAccount;
     mapping(address => uint256) staking;
 
     event Deposit(address indexed _account, uint256 _amount, uint256 _timestamp);
@@ -49,6 +49,7 @@ contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContra
     {
         IERC20Token(registry.addressOf(CNUS_TOKEN)).transferFrom(msg.sender, this, _amount);
         staking[msg.sender] = staking[msg.sender].add(_amount);
+        emit Deposit(msg.sender, _amount, now);
     }
 
     /**
@@ -64,6 +65,7 @@ contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContra
         require(staking[msg.sender] >= _amount);
         IERC20Token(registry.addressOf(CNUS_TOKEN)).transfer(msg.sender, _amount);
         staking[msg.sender] = staking[msg.sender].sub(_amount);
+        emit Withdrawal(msg.sender, _amount, now);
     }
 
     /**

@@ -10,12 +10,14 @@ const ContractFeatures = artifacts.require('ContractFeatures.sol')
 const ContractRegistry = artifacts.require('ContractRegistry.sol')
 const BnusToken = artifacts.require('BnusToken.sol')
 const CnusTokenMockUp = artifacts.require('CnusTokenMockUp.sol')
+const CnusPoolForStaking = artifacts.require('CnusPoolForStaking.sol')
 
 module.exports = async function (deployer, network, accounts) {
   deployer.then(() => {
     return ContractRegistry.deployed()
   }).then(async (registry) => {
     let tokenPool = await TokenPool.deployed()
+    let cnusPoolForStaking = await CnusPoolForStaking.deployed()
     let contractFeatures = await ContractFeatures.deployed()
     let contractIds = await ContractIds.deployed()
     let coinVerseContractIds = await CoinVerseContractIds.deployed()
@@ -25,7 +27,7 @@ module.exports = async function (deployer, network, accounts) {
     let converterFactory = await BancorConverterFactory.deployed()
     let converterUpgrader = await BancorConverterUpgrader.deployed()
     let cnusAddress
-    if (network == 'mainnet') {
+    if (network === 'mainnet') {
       cnusAddress = '0x722f2f3eac7e9597c73a593f7cf3de33fbfc3308'
     } else {
       cnusAddress = (await CnusTokenMockUp.deployed()).address
@@ -33,7 +35,6 @@ module.exports = async function (deployer, network, accounts) {
     let bnus = await BnusToken.deployed()
     let cnus = await CnusTokenMockUp.at(cnusAddress)
 
-    await tokenPool.setRegistry(registry.address)
     await registry.registerAddress(await contractIds.CONTRACT_FEATURES.call(), contractFeatures.address)
     await registry.registerAddress(await contractIds.BANCOR_GAS_PRICE_LIMIT.call(), bancorGasLimit.address)
     await registry.registerAddress(await contractIds.BANCOR_FORMULA.call(), bancorFormula.address)
@@ -43,5 +44,6 @@ module.exports = async function (deployer, network, accounts) {
     await registry.registerAddress(await coinVerseContractIds.TOKEN_POOL.call(), tokenPool.address)
     await registry.registerAddress(await coinVerseContractIds.BNUS_TOKEN.call(), bnus.address)
     await registry.registerAddress(await coinVerseContractIds.CNUS_TOKEN.call(), cnus.address)
+    await registry.registerAddress(await coinVerseContractIds.CNUS_POOL_FOR_STAKING.call(), cnus.address)
   })
 }

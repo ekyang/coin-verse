@@ -12,7 +12,9 @@ contract('CnusPoolForStaking', async () => {
 
   context('It has customized features', async () => {
     describe('Events', async () => {
-      it('should emit Deposit event when a user stakes Cnus', async () => {})
+      it('should emit Deposit event when a user stakes Cnus', async () => {
+
+      })
       it('should emit Withdrawal event when a user withdraw staked Cnus', async () => {})
     })
     describe('Getters', async () => {

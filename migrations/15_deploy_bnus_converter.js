@@ -9,7 +9,7 @@ module.exports = async function (deployer, network, accounts) {
     return ContractRegistry.deployed()
   }).then(async (registry) => {
     let cnusAddress
-    if (network == 'mainnet') {
+    if (network === 'mainnet') {
       cnusAddress = '0x722f2f3eac7e9597c73a593f7cf3de33fbfc3308'
     } else {
       cnusAddress = (await CnusTokenMockUp.deployed()).address

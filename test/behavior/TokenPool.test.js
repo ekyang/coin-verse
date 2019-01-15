@@ -28,7 +28,8 @@ contract('TokenPool', async (accounts) => {
     })
 
     describe('Events', async () => {
-      it('should emit Airdrop event when the admin proceeded airdrops', async () => {})
+      it('should emit Airdrop event when the admin proceeded airdrops', async () => {
+      })
     })
     describe('Getters', async () => {
       describe('getBalance()', async () => {

@@ -10,12 +10,14 @@ module.exports = {
     const CoinVerseContractIds = artifacts.require('CoinVerseContractIds.sol')
     const ContractFeatures = artifacts.require('ContractFeatures.sol')
     const ContractRegistry = artifacts.require('ContractRegistry.sol')
+    const CnusPoolForStaking = artifacts.require('CnusPoolForStaking.sol')
     let contractRegistry
     let contractIds
     let coinVerseContractIds
     let contractFeatures
     let upgrader
     let tokenPool
+    let cnusPoolForStaking
     contractRegistry = await ContractRegistry.new()
     contractIds = await ContractIds.new()
     coinVerseContractIds = await CoinVerseContractIds.new()
@@ -50,13 +52,19 @@ module.exports = {
     let tokenPoolId = await coinVerseContractIds.TOKEN_POOL.call()
     await contractRegistry.registerAddress(tokenPoolId, tokenPool.address)
 
+    cnusPoolForStaking = await CnusPoolForStaking.new()
+    await cnusPoolForStaking.setRegistry(contractRegistry.address)
+    let cnusPoolForStakingId = await coinVerseContractIds.CNUS_POOL_FOR_STAKING.call()
+    await contractRegistry.registerAddress(cnusPoolForStakingId, cnusPoolForStaking.address)
+
     return {
       contractRegistry,
       contractIds,
       coinVerseContractIds,
       contractFeatures,
       upgrader,
-      tokenPool
+      tokenPool,
+      cnusPoolForStaking
     }
   },
   initConverter: async (artifacts, accounts, contracts) => {
@@ -79,13 +87,13 @@ module.exports = {
       cnusToken.address,
       50000
     )
-    await bnusConverter.setConversionFee(50000)
-    await bnusToken.issue(accounts[1], 20000)
-    await cnusToken.transfer(bnusConverter.address, 5000)
-    await cnusToken.transfer(accounts[1], 1000000)
-
+    await bnusConverter.setConversionFee(10000)
+    await bnusToken.issue(contracts.tokenPool.address, 20000000)
     await bnusToken.transferOwnership(bnusConverter.address)
     await bnusConverter.acceptTokenOwnership()
+
+    await cnusToken.transfer(bnusConverter.address, 1000000)
+    await cnusToken.transfer(accounts[1], 1000000)
 
     return [bnusConverter, bnusToken, cnusToken, contracts.tokenPool]
   }

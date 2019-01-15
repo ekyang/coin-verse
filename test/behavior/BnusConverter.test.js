@@ -30,15 +30,15 @@ contract('BnusConverter', async (accounts) => {
 
     describe('Getters', async () => {
       describe('getCnusBalance()', async () => {
-        it('should return 5000 as its initial value', async () => {
+        it('should return 1000000 as its initial value', async () => {
           let balance = await converter.getCnusBalance()
-          balance.toNumber().should.equal(5000)
+          balance.toNumber().should.equal(1000000)
         })
-        it('should return 15000 after a user bought Bnus using 10000 of Cnus', async () => {
+        it('should return 1010000 after a user bought Bnus using 10000 of Cnus', async () => {
           await cnusToken.approve(converter.address, 10000, { from: accounts[1] })
           await converter.buyBnus(10000, 1, { from: accounts[1] })
           let balance = await converter.getCnusBalance()
-          balance.toNumber().should.equal(15000)
+          balance.toNumber().should.equal(1010000)
         })
       })
     })
@@ -61,7 +61,23 @@ contract('BnusConverter', async (accounts) => {
         })
         it('should send the conversion fee to the token pool instead of burning them', async () => {
           // Get initial balance
-          let initialBalance = await converter.getCnusBalance()
+          let initialBalance = await bnusToken.balanceOf(tokenPool.address)
+          // Buy Bnus
+          let buyAmount = 10000
+          let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, buyAmount)
+          await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
+          await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
+
+          // Get updated balance
+          let updatedBalance = await bnusToken.balanceOf(tokenPool.address)
+          let receivedConversionFee = updatedBalance.toNumber() - initialBalance.toNumber()
+          // Check that bnus tokens are sent to the reward pool successfully
+          receivedConversionFee.should.equal(fee.toNumber())
+        })
+        it('should increase bnus balance of the message sender', async () => {
+          // Get initial balance
+          let initialBalance = await bnusToken.balanceOf(accounts[1])
+          initialBalance.toNumber().should.equal(0)
 
           // Buy Bnus
           let buyAmount = 10000
@@ -70,11 +86,31 @@ contract('BnusConverter', async (accounts) => {
           await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
 
           // Check that bnus tokens are sent to the reward pool successfully
-          let receivedConversionFee = await bnusToken.balanceOf(tokenPool.address)
-          receivedConversionFee.toNumber().should.equal(fee.toNumber())
+          let updatedBalance = await bnusToken.balanceOf(accounts[1])
+          updatedBalance.toNumber().should.equal(initialBalance.toNumber() + expectedBnus.toNumber())
+        })
+        it('should be executable multiple times', async () => {
+          let buyBnus = async () => {
+            // Get initial balance
+            let initialBalance = await bnusToken.balanceOf(accounts[1])
+
+            // Buy Bnus
+            let buyAmount = 10000
+            let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, buyAmount)
+            await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
+            await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
+            let updatedBalance = await bnusToken.balanceOf(accounts[1])
+            updatedBalance.toNumber().should.equal(initialBalance.toNumber() + expectedBnus.toNumber())
+          }
+          for (let i = 0; i < 5; i++) {
+            await buyBnus()
+          }
         })
       })
       describe('sellBnus()', async () => {
+        beforeEach(async () => {
+          await tokenPool.airdropBnus(accounts[1], 10000)
+        })
         it('should decrease cnus balance of the converter', async () => {
           let initialBalance = await converter.getCnusBalance()
 
@@ -119,6 +155,9 @@ contract('BnusConverter', async (accounts) => {
     })
 
     describe('Events', async () => {
+      beforeEach(async () => {
+        await tokenPool.airdropBnus(accounts[1], 10000)
+      })
       it('should emit Conversion event & PriceDataUpdate event when people buy Bnus', async () => {
         // Get initial balance
         let initialBalance = await converter.getCnusBalance()

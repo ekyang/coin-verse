@@ -1151,7 +1151,7 @@ contract CnusToken is StandardToken, Ownable, BurnableToken {
     }
 }
 
-contract CnusTokenMockup is CnusToken {
+contract CnusTokenMockUp is CnusToken {
     constructor()
     CnusToken()
     {

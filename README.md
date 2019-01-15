@@ -19,7 +19,7 @@ CoinUs dApp network
 | BancorNetwork           | `0x7d9790794452848edb317ab1221acb3c7c5d7e32` |
 | **TokenPool**           | `0x7358bf76407a8a9d57c790d882a0d73d2bacff34` |
 | **BnusToken**           | `0xfea8dcd38b76b3e047948c9af86d45d18ebfe144` |
-| CnusTokenMockup         | `0x03f00eff0af3e49e9ec24ceb5f27e62e7ca18778` |
+| CnusTokenMockUp         | `0x03f00eff0af3e49e9ec24ceb5f27e62e7ca18778` |
 | **BnusConverter**       | `0xaad81156fa442e704cee07e37d9e27d449ef9632` |
 
 #### Mainnet
@@ -37,7 +37,7 @@ CoinUs dApp network
 | BancorNetwork           | `0x0000000000000000000000000000000000000000` |
 | **TokenPool**           | `0x0000000000000000000000000000000000000000` |
 | **BnusToken**           | `0x0000000000000000000000000000000000000000` |
-| CnusTokenMockup         | `0x0000000000000000000000000000000000000000` |
+| CnusTokenMockUp         | `0x0000000000000000000000000000000000000000` |
 | **BnusConverter**       | `0x0000000000000000000000000000000000000000` |
 
 

@@ -61,11 +61,11 @@ module.exports = {
   },
   initConverter: async (artifacts, accounts, contracts) => {
     const BnusToken = artifacts.require('BnusToken.sol')
-    const CnusTokenMockup = artifacts.require('CnusTokenMockup.sol')
+    const CnusTokenMockUp = artifacts.require('CnusTokenMockUp.sol')
     const BnusConverter = artifacts.require('BnusConverter.sol')
 
     let bnusToken = await BnusToken.new('CoinUs', 'BNUS', 18)
-    let cnusToken = await CnusTokenMockup.new()
+    let cnusToken = await CnusTokenMockUp.new()
 
     let bnusTokenId = await contracts.coinVerseContractIds.BNUS_TOKEN.call()
     let cnusTokenId = await contracts.coinVerseContractIds.CNUS_TOKEN.call()

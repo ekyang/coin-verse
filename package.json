@@ -1,6 +1,6 @@
 {
   "name": "coin-verse",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CoinVerse is a comprehensive package based on a human-to-blockchain interface designed to build an integrated cryptocurrency ecosystem",
   "directories": {
     "test": "test"

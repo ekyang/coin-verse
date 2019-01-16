@@ -23,13 +23,13 @@ module.exports = function (deployer, network, accounts) {
     assert(bnusConverter !== undefined, 'Not deployed')
 
     await bnusConverter.setConversionFee(10000)
-    await bnus.issue(tokenPool.address, 20000000)
+    await bnus.issue(tokenPool.address, 20000000 * Math.pow(10, 18))
     await bnus.transferOwnership(bnusConverter.address)
     await bnusConverter.acceptTokenOwnership()
 
     if (network !== 'mainnet') {
-      await cnus.transfer(bnusConverter.address, 1000000)
-      await cnus.transfer(accounts[1], 1000000)
+      await cnus.transfer(bnusConverter.address, 1000000 * Math.pow(10, 18))
+      await cnus.transfer(accounts[1], 1000000 * Math.pow(10, 18))
     }
   })
 }

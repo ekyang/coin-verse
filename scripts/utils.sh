@@ -54,3 +54,20 @@ run_test() {
 run_coverage() {
   ./node_modules/.bin/solidity-coverage
 }
+
+flatten() {
+  ./node_modules/.bin/truffle-flattener contracts/BnusConverter.sol > build/BnusConverterFlattened.sol
+  ./node_modules/.bin/truffle-flattener contracts/BnusToken.sol > build/BnusTokenFlattened.sol
+  ./node_modules/.bin/truffle-flattener contracts/CnusPoolForStaking.sol > build/CnusPoolForStakingFlattened.sol
+  ./node_modules/.bin/truffle-flattener contracts/CnusTokenMockUp.sol > build/CnusTokenMockUpFlattened.sol
+  ./node_modules/.bin/truffle-flattener contracts/TokenPool.sol > build/TokenPoolFlattened.sol
+  ./node_modules/.bin/truffle-flattener contracts/CoinVerseContractIds.sol > build/CoinVerseContractIdsFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/BancorNetwork.sol > build/BancorNetworkFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/ContractIds.sol > build/ContractIdsFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/converter/BancorConverterFactory.sol > build/BancorConverterFactoryFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/converter/BancorConverterUpgrader.sol > build/BancorConverterUpgraderFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/converter/BancorGasPriceLimit.sol > build/BancorGasPriceLimitFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/converter/BancorFormula.sol > build/BancorFormulaFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/utility/ContractFeatures.sol > build/ContractFeaturesFlattened.sol
+  ./node_modules/.bin/truffle-flattener node_modules/bancor-contracts/solidity/contracts/utility/ContractRegistry.sol > build/ContractRegistryFlattened.sol
+}

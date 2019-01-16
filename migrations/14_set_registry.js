@@ -45,6 +45,6 @@ module.exports = async function (deployer, network, accounts) {
     await registry.registerAddress(await coinVerseContractIds.TOKEN_POOL.call(), tokenPool.address)
     await registry.registerAddress(await coinVerseContractIds.BNUS_TOKEN.call(), bnus.address)
     await registry.registerAddress(await coinVerseContractIds.CNUS_TOKEN.call(), cnus.address)
-    await registry.registerAddress(await coinVerseContractIds.CNUS_POOL_FOR_STAKING.call(), cnus.address)
+    await registry.registerAddress(await coinVerseContractIds.CNUS_POOL_FOR_STAKING.call(), cnusPoolForStaking.address)
   })
 }

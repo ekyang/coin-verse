@@ -8,20 +8,20 @@ CoinUs dApp network
 
 | Contract                | Address                                      |
 | ----------------------- | -------------------------------------------- |
-| ContractRegistry        | `0xa15c31487152feb2b496771b5455ee859e08a593` |
-| CoinVerseContractIds    | `0x992943a8db682642401cf57efb797a0916ebf1a5` |
-| ContractIds             | `0x876c90da037a014427e2a3956cef79c053a8c35e` |
-| ContractFeatures        | `0x09b4c953cb0c3bd74efc03e695fbc988a87fdfb6` |
-| BancorFormula           | `0x61d69d9d9629a5a15c34646f501374b2a181adad` |
-| BancorGasPriceLimit     | `0x0d606b13ba659e9a5a85747d85fc25d031accbd9` |
-| BancorConverterFactory  | `0xa383b844d820e7c8febd0548e1ebd39bf0cd4430` |
-| BancorConverterUpgrader | `0xddfbb15f76ea7eb136fe62bf83eb28f7c802d73d` |
-| BancorNetwork           | `0x2cd3b7e5b6b79e3ddc6b6b16ea67a4e0716c6219` |
-| **TokenPool**               | `0x2b59167a65fc1a1eaeae2f791ed7c01aa8bfadeb` |
-| CnusPoolForStaking      | `0xf189ccfd1317af58329a0a0f6780f8f0224252ce` |
-| **BnusToken**               | `0xbeebff2ff8c2c1a2bbc61ffb88873195006631a7` |
-| CnusTokenMockUp         | `0xf0fc1aea203ac4f0fdb9a530c8773d8e0fe09595` |
-| **BnusConverter**           | `0xadec9a3fefa20f5e1275c911700fd6208c9ae0f3` |
+| ContractRegistry        | `0x39bc39da9ef64b613a72789a9f1fa0b402dffb1c` |
+| CoinVerseContractIds    | `0x30b7d1965a97919a669b05ca07d6760ab7299197` |
+| ContractIds             | `0x928a21a3bc2e5f2798e4a9e6662affcd43550440` |
+| ContractFeatures        | `0xca706519f0b08e0d43538b67ea768217c072b875` |
+| BancorFormula           | `0x663207b00491d775defd0b3677e2ed987523541c` |
+| BancorGasPriceLimit     | `0x56a0a30839a160483a99d63ee0c7fb6d7375d606` |
+| BancorConverterFactory  | `0x6877b3c566274533741511b521770b52273e8c05` |
+| BancorConverterUpgrader | `0xe75d243a66d2e714bb8f61fba91f902d0f2f7ed0` |
+| BancorNetwork           | `0x11b74521c3840043dcc123c784338aff47a976cf` |
+| **TokenPool**               | `0x9e11506505e7cab10a541cbdf4c2555090ff81a3` |
+| CnusPoolForStaking      | `0xb2b7bbe0cc346e2f49f0a84bda7032f1b96adea1` |
+| **BnusToken**               | `0xcef5478cf1d5a6fe9b158677699f09a2d88ccafc` |
+| CnusTokenMockUp         | `0x3c79be2eecb54a9771942e73bd5b152bb31e9569` |
+| **BnusConverter**           | `0x1cfe3844b2cef53dbefddd1c68e8ea3dde8322c0` |
 
 #### Mainnet
 

@@ -88,7 +88,7 @@ module.exports = {
       50000
     )
     await bnusConverter.setConversionFee(10000)
-    await bnusToken.issue(contracts.tokenPool.address, web3.toWei(20000000))
+    await bnusToken.issue(bnusConverter.address, web3.toWei(20000000))
     await bnusToken.transferOwnership(bnusConverter.address)
     await bnusConverter.acceptTokenOwnership()
 

@@ -23,7 +23,7 @@ module.exports = function (deployer, network, accounts) {
     assert(bnusConverter !== undefined, 'Not deployed')
 
     await bnusConverter.setConversionFee(10000)
-    await bnus.issue(tokenPool.address, web3.toWei(20000000))
+    await bnus.issue(bnusConverter.address, web3.toWei(20000000))
     await bnus.transferOwnership(bnusConverter.address)
     await bnusConverter.acceptTokenOwnership()
 

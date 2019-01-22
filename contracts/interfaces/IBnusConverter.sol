@@ -8,14 +8,22 @@ contract IBnusConverter {
     function getCnusBalance() public view returns (uint256);
 
     /**
-       @dev buys bnus
-       @param _depositAmount  amount of cnus to buy bnus
-    */
-    function buyBnus(uint256 _depositAmount, uint256 _minReturn) public returns (uint256);
+     * @dev Customized function for Coin Verse system
+     * @param _depositAmount amount of Cnus to buy Bnus
+     * @param _minReturn expected minimum return of Bnus. It is cancelled when the returned amount of Bnus is smaller
+      than the _minReturn,
+     * @param _expiration the signature will expire after the given timestamp
+     * @param _signature signed hash value with the private key of CoinUs wallet
+     */
+    function buyBnus(uint256 _depositAmount, uint256 _minReturn, uint256 _expiration, bytes memory _signature) public;
 
     /**
-       @dev sell bnus
-       @param _sellAmount  amount of cnus to buy bnus
-    */
-    function sellBnus(uint256 _sellAmount, uint256 _minReturn) public returns (uint256);
+     * @dev Customized function for Coin Verse system
+     * @param _sellAmount amount of Cnus to buy Bnus
+     * @param _minReturn expected minimum return of Bnus. It is cancelled when the returned amount of Bnus is smaller
+      than the _minReturn,
+     * @param _expiration the signature will expire after the given timestamp
+     * @param _signature signed hash value with the private key of CoinUs wallet
+     */
+    function sellBnus(uint256 _sellAmount, uint256 _minReturn, uint256 _expiration, bytes memory _signature) public;
 }

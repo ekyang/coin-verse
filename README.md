@@ -10,20 +10,20 @@ Version: 0.1.2
 
 | Contract                | Address                                      |
 | ----------------------- | -------------------------------------------- |
-| ContractRegistry        | `0x6fc938ea4b5fb770759e9639f2de7b5a7c13167c` |
-| CoinVerseContractIds    | `0xe434edf60ad66636f0537cd6fd067fa3fe31f675` |
-| ContractIds             | `0x92f97c8b17285d2315a48473e65ea58fadbb5a3f` |
-| ContractFeatures        | `0xc574ef50ccdec282197dc8fe2784e5163b00d5f4` |
-| BancorFormula           | `0x71233c3234cffa825f0a6ccbf0a66e03dd5f28a4` |
-| BancorGasPriceLimit     | `0x6174932bf64f0fdeb98d0effd0c61b93721107a1` |
-| BancorConverterFactory  | `0xf5a660342125d5f33b9bee74fb1a3849be707322` |
-| BancorConverterUpgrader | `0xa1f787efc1d38d3a24b49b046f57b47494268ee3` |
-| BancorNetwork           | `0x85731aabd4b08909f5918c7004e57f0120701ec6` |
-| [**TokenPool**](https://ropsten.etherscan.io/address/0x9b4629561eacb1bbeb4c12b092798c6dfb9b519f#writeContract)            | `0x9b4629561eacb1bbeb4c12b092798c6dfb9b519f` |
-| [**CnusPoolForStaking**](https://ropsten.etherscan.io/address/0x047666b3504a2eda85d9e91528666a8b9822776a#writeContract)   | `0x047666b3504a2eda85d9e91528666a8b9822776a` |
-| [**BnusToken**](https://ropsten.etherscan.io/address/0x852af8c61aaab54f9f2fe50c902abb30ee7ea426#writeContract)            | `0x852af8c61aaab54f9f2fe50c902abb30ee7ea426` |
-| [**CnusTokenMockUp**](https://ropsten.etherscan.io/address/0x2e66549425db5c35e204ff69cc164a5c502df473#writeContract)      | `0x2e66549425db5c35e204ff69cc164a5c502df473` |
-| [**BnusConverter**](https://ropsten.etherscan.io/address/0x8427fce0271162d72c9a3d5698171751ef0e7d91#writeContract)        | `0x8427fce0271162d72c9a3d5698171751ef0e7d91` |
+| ContractRegistry        | `0x2479ba8a10c7dd2b712a6719d3214ce02f369ed7` |
+| CoinVerseContractIds    | `0x70b565f72807161d4cb4f618aa571fcf52fc48f9` |
+| ContractIds             | `0xcdadb33b263a9ba7957e2a00254b536da4297c2e` |
+| ContractFeatures        | `0xb6c50a40312ae8066a3d7e97f394bbc6f80de7fd` |
+| BancorFormula           | `0x381629736d24601214b13e120f19a5513988a4f5` |
+| BancorGasPriceLimit     | `0xd38eccbb62a8e76012709be5c3f43cf598dd7bc7` |
+| BancorConverterFactory  | `0x7aeb32d73bf9719fcbe0b6b97d42c53d9f4bf77e` |
+| BancorConverterUpgrader | `0xecb3d673a0132be4684773960abd88b8fb86d2c8` |
+| BancorNetwork           | `0xfe65e5591b9e28ebd92a061c43af5a5530930033` |
+| [**TokenPool**](https://ropsten.etherscan.io/address/0x21015bff3f70ad3badb6b3e66f114dfc96aa29e5#writeContract)            | `0x21015bff3f70ad3badb6b3e66f114dfc96aa29e5` |
+| [**CnusPoolForStaking**](https://ropsten.etherscan.io/address/0xdb7d401ef3c10e9e3ecce8ef9a3b657768e63e03#writeContract)   | `0xdb7d401ef3c10e9e3ecce8ef9a3b657768e63e03` |
+| [**BnusToken**](https://ropsten.etherscan.io/address/0x92968ff7cfd714bb61cd540742f05bd1f1013b7b#writeContract)            | `0x92968ff7cfd714bb61cd540742f05bd1f1013b7b` |
+| [**CnusTokenMockUp**](https://ropsten.etherscan.io/address/0x4a5dc96d6c7e6b841417692416f51f5ac7cd43e2#writeContract)      | `0x4a5dc96d6c7e6b841417692416f51f5ac7cd43e2` |
+| [**BnusConverter**](https://ropsten.etherscan.io/address/0xe568bb7025d00f11f941f580b25835a351d745bb#writeContract)        | `0xe568bb7025d00f11f941f580b25835a351d745bb` |
 
 
 #### Mainnet

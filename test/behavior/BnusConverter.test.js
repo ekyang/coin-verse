@@ -3,10 +3,11 @@ const assert = chai.assert
 const BigNumber = web3.BigNumber
 const should = chai.use(require('chai-bignumber')(BigNumber)).should()
 const { Contract, Protocol } = require('../protocol/Bancor')
-const { deployContracts, initConverter } = require('../helper')
+const { deployContracts, initConverter, encodePacked, toUint256 } = require('../helper')
 const BnusConverter = artifacts.require('BnusConverter.sol')
 
 contract('BnusConverter', async (accounts) => {
+  let [_, owner, signer, testUser, invalidSigner] = accounts
   // Basically, it should pass all test cases of the bancor protocol.
   context('It follows the bancor protocol', async () => {
     it('should pass the bancor protocol test cases', async () => {
@@ -17,7 +18,7 @@ contract('BnusConverter', async (accounts) => {
   context('It has customized features', async () => {
     let contracts
     before(async () => {
-      contracts = await deployContracts(artifacts, accounts)
+      contracts = await deployContracts(artifacts, owner, signer)
     })
 
     let converter
@@ -25,7 +26,7 @@ contract('BnusConverter', async (accounts) => {
     let cnusToken
     let tokenPool
     beforeEach(async () => {
-      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, accounts, contracts)
+      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, contracts, owner, signer, testUser)
     })
 
     describe('Getters', async () => {
@@ -35,8 +36,19 @@ contract('BnusConverter', async (accounts) => {
           balance.toPrecision().should.equal(web3.toWei(1000000))
         })
         it('should return 1010000 after a user bought Bnus using 10000 of Cnus', async () => {
-          await cnusToken.approve(converter.address, web3.toWei(10000), { from: accounts[1] })
-          await converter.buyBnus(web3.toWei(10000), 1, { from: accounts[1] })
+          let buyAmount = web3.toWei(10000)
+          let minReturn = web3.toWei(1)
+          await cnusToken.approve(converter.address, buyAmount, { from: testUser })
+          let expiration = Math.round((new Date).getTime() / 1000) + 300
+          let hashToSign, signature
+          if (web3.version.api < '1.0.0') {
+            hashToSign = web3.sha3(encodePacked([toUint256(buyAmount), toUint256(minReturn), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
+          } else {
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(buyAmount), toUint256(minReturn), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
+          }
+          await converter.buyBnus(buyAmount, minReturn, expiration, signature, { from: testUser })
           let balance = await converter.getCnusBalance()
           balance.toPrecision().should.equal(web3.toWei(1010000))
         })
@@ -51,9 +63,18 @@ contract('BnusConverter', async (accounts) => {
 
           // Buy Bnus
           let buyAmount = web3.toWei(10000)
-          let minReturn = 1
-          await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
-          await converter.buyBnus(buyAmount, minReturn, { from: accounts[1] })
+          let minReturn = web3.toWei(1)
+          await cnusToken.approve(converter.address, buyAmount, { from: testUser })
+          let expiration = Math.round((new Date).getTime() / 1000) + 300
+          let hashToSign, signature
+          if (web3.version.api < '1.0.0') {
+            hashToSign = web3.sha3(encodePacked([toUint256(buyAmount), toUint256(minReturn), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
+          } else {
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(buyAmount), toUint256(minReturn), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
+          }
+          await converter.buyBnus(buyAmount, minReturn, expiration, signature, { from: testUser })
 
           // Check updated balance
           let updatedBalance = await converter.getCnusBalance()
@@ -65,8 +86,17 @@ contract('BnusConverter', async (accounts) => {
           // Buy Bnus
           let buyAmount = web3.toWei(10000)
           let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, buyAmount)
-          await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
-          await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
+          await cnusToken.approve(converter.address, buyAmount, { from: testUser })
+          let expiration = Math.round((new Date).getTime() / 1000) + 300
+          let hashToSign, signature
+          if (web3.version.api < '1.0.0') {
+            hashToSign = web3.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
+          } else {
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
+          }
+          await converter.buyBnus(buyAmount, expectedBnus, expiration, signature, { from: testUser })
 
           // Get updated balance
           let updatedBalance = await bnusToken.balanceOf(tokenPool.address)
@@ -76,30 +106,48 @@ contract('BnusConverter', async (accounts) => {
         })
         it('should increase bnus balance of the message sender', async () => {
           // Get initial balance
-          let initialBalance = await bnusToken.balanceOf(accounts[1])
+          let initialBalance = await bnusToken.balanceOf(testUser)
           initialBalance.equals(0).should.equal(true)
 
           // Buy Bnus
           let buyAmount = web3.toWei(10000)
           let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, buyAmount)
-          await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
-          await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
+          await cnusToken.approve(converter.address, buyAmount, { from: testUser })
+          let expiration = Math.round((new Date).getTime() / 1000) + 300
+          let hashToSign, signature
+          if (web3.version.api < '1.0.0') {
+            hashToSign = web3.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
+          } else {
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
+          }
+          await converter.buyBnus(buyAmount, expectedBnus, expiration, signature, { from: testUser })
 
           // Check that bnus tokens are sent to the reward pool successfully
-          let updatedBalance = await bnusToken.balanceOf(accounts[1])
+          let updatedBalance = await bnusToken.balanceOf(testUser)
           initialBalance.add(expectedBnus).equals(updatedBalance).should.equal(true)
         })
         it('should be executable multiple times', async () => {
           let buyBnus = async () => {
             // Get initial balance
-            let initialBalance = await bnusToken.balanceOf(accounts[1])
+            let initialBalance = await bnusToken.balanceOf(testUser)
 
             // Buy Bnus
             let buyAmount = web3.toWei(10000)
             let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, buyAmount)
-            await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
-            await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
-            let updatedBalance = await bnusToken.balanceOf(accounts[1])
+            await cnusToken.approve(converter.address, buyAmount, { from: testUser })
+            let expiration = Math.round((new Date).getTime() / 1000) + 300
+            let hashToSign, signature
+            if (web3.version.api < '1.0.0') {
+              hashToSign = web3.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+              signature = web3.eth.sign(signer, hashToSign)
+            } else {
+              hashToSign = web3.utils.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+              signature = web3.eth.sign(hashToSign, signer)
+            }
+            await converter.buyBnus(buyAmount, expectedBnus, expiration, signature, { from: testUser })
+            let updatedBalance = await bnusToken.balanceOf(testUser)
             initialBalance.add(expectedBnus).equals(updatedBalance).should.equal(true)
           }
           for (let i = 0; i < 5; i++) {
@@ -109,8 +157,8 @@ contract('BnusConverter', async (accounts) => {
       })
       describe('sellBnus()', async () => {
         beforeEach(async () => {
-          await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(100000))
-          await tokenPool.airdropBnus(accounts[1], web3.toWei(10000))
+          await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(100000), { from: owner })
+          await tokenPool.airdropBnus(testUser, web3.toWei(10000), { from: owner })
         })
         it('should decrease cnus balance of the converter', async () => {
           let initialBalance = await converter.getCnusBalance()
@@ -118,7 +166,16 @@ contract('BnusConverter', async (accounts) => {
           // Sell Bnus
           let sellAmount = web3.toWei(1000)
           let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, sellAmount)
-          await converter.sellBnus(sellAmount, expectedCnus, { from: accounts[1] })
+          let expiration = Math.round((new Date).getTime() / 1000) + 300
+          let hashToSign, signature
+          if (web3.version.api < '1.0.0') {
+            hashToSign = web3.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
+          } else {
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
+          }
+          await converter.sellBnus(sellAmount, expectedCnus, expiration, signature, { from: testUser })
 
           // Check updated balance
           let updatedBalance = await converter.getCnusBalance()
@@ -131,7 +188,16 @@ contract('BnusConverter', async (accounts) => {
             // Sell Bnus
             let sellAmount = web3.toWei(1000)
             let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, sellAmount)
-            await converter.sellBnus(sellAmount, expectedCnus, { from: accounts[1] })
+            let expiration = Math.round((new Date).getTime() / 1000) + 300
+            let hashToSign, signature
+            if (web3.version.api < '1.0.0') {
+              hashToSign = web3.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+              signature = web3.eth.sign(signer, hashToSign)
+            } else {
+              hashToSign = web3.utils.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+              signature = web3.eth.sign(hashToSign, signer)
+            }
+            await converter.sellBnus(sellAmount, expectedCnus, expiration, signature, { from: testUser })
 
             // Check updated balance
             let updatedBalance = await converter.getCnusBalance()
@@ -145,8 +211,16 @@ contract('BnusConverter', async (accounts) => {
           // Sell Bnus
           let sellAmount = web3.toWei(1000)
           let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, sellAmount)
-          await bnusToken.approve(converter.address, sellAmount, { from: accounts[1] })
-          await converter.sellBnus(sellAmount, expectedCnus, { from: accounts[1] })
+          let expiration = Math.round((new Date).getTime() / 1000) + 300
+          let hashToSign, signature
+          if (web3.version.api < '1.0.0') {
+            hashToSign = web3.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
+          } else {
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
+          }
+          await converter.sellBnus(sellAmount, expectedCnus, expiration, signature, { from: testUser })
 
           // Check that bnus tokens are sent to the reward pool successfully
           let receivedConversionFee = await cnusToken.balanceOf(tokenPool.address)
@@ -157,18 +231,24 @@ contract('BnusConverter', async (accounts) => {
 
     describe('Events', async () => {
       beforeEach(async () => {
-        await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(100000))
-        await tokenPool.airdropBnus(accounts[1], web3.toWei(10000))
+        await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(100000), { from: owner })
+        await tokenPool.airdropBnus(testUser, web3.toWei(10000), { from: owner })
       })
       it('should emit Conversion event & PriceDataUpdate event when people buy Bnus', async () => {
-        // Get initial balance
-        let initialBalance = await converter.getCnusBalance()
-
         // Buy Bnus
         let buyAmount = web3.toWei(10000)
         let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, buyAmount)
-        await cnusToken.approve(converter.address, buyAmount, { from: accounts[1] })
-        let receipt = await converter.buyBnus(buyAmount, expectedBnus, { from: accounts[1] })
+        await cnusToken.approve(converter.address, buyAmount, { from: testUser })
+        let expiration = Math.round((new Date).getTime() / 1000) + 300
+        let hashToSign, signature
+        if (web3.version.api < '1.0.0') {
+          hashToSign = web3.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+          signature = web3.eth.sign(signer, hashToSign)
+        } else {
+          hashToSign = web3.utils.sha3(encodePacked([toUint256(buyAmount), toUint256(expectedBnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+          signature = web3.eth.sign(hashToSign, signer)
+        }
+        let receipt = await converter.buyBnus(buyAmount, expectedBnus, expiration, signature, { from: testUser })
 
         // Check emitted events
         let conversionEvent
@@ -186,7 +266,7 @@ contract('BnusConverter', async (accounts) => {
         should.exist(conversionEvent)
         conversionEvent.args._fromToken.should.equal(cnusToken.address)
         conversionEvent.args._toToken.should.equal(bnusToken.address)
-        conversionEvent.args._trader.should.equal(accounts[1])
+        conversionEvent.args._trader.should.equal(testUser)
         conversionEvent.args._amount.equals(buyAmount).should.equal(true)
         conversionEvent.args._return.equals(expectedBnus).should.equal(true)
         conversionEvent.args._conversionFee.equals(fee).should.equal(true)
@@ -200,10 +280,18 @@ contract('BnusConverter', async (accounts) => {
 
       it('should emit Conversion event and PriceDataUpdate event when people sell Bnus', async () => {
         // Sell Bnus
-        let sellAmount = web3.toWei(10)
+        let sellAmount = web3.toWei(1000)
         let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, sellAmount)
-        await bnusToken.approve(converter.address, sellAmount, { from: accounts[1] })
-        let receipt = await converter.sellBnus(sellAmount, expectedCnus, { from: accounts[1] })
+        let expiration = Math.round((new Date).getTime() / 1000) + 300
+        let hashToSign, signature
+        if (web3.version.api < '1.0.0') {
+          hashToSign = web3.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+          signature = web3.eth.sign(signer, hashToSign)
+        } else {
+          hashToSign = web3.utils.sha3(encodePacked([toUint256(sellAmount), toUint256(expectedCnus.toPrecision()), toUint256(expiration)]), { encoding: 'hex' })
+          signature = web3.eth.sign(hashToSign, signer)
+        }
+        let receipt = await converter.sellBnus(sellAmount, expectedCnus, expiration, signature, { from: testUser })
 
         // Check emitted events
         let conversionEvent
@@ -221,7 +309,7 @@ contract('BnusConverter', async (accounts) => {
         should.exist(conversionEvent)
         conversionEvent.args._fromToken.should.equal(bnusToken.address)
         conversionEvent.args._toToken.should.equal(cnusToken.address)
-        conversionEvent.args._trader.should.equal(accounts[1])
+        conversionEvent.args._trader.should.equal(testUser)
         conversionEvent.args._amount.equals(sellAmount).should.equal(true)
         conversionEvent.args._return.equals(expectedCnus).should.equal(true)
         conversionEvent.args._conversionFee.equals(fee).should.equal(true)

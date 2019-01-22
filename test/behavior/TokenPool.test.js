@@ -7,16 +7,18 @@ const { deployContracts, initConverter } = require('../helper')
 const TokenPool = artifacts.require('TokenPool.sol')
 
 contract('TokenPool', async (accounts) => {
-  // Basically, it should pass all test cases of the bancor protocol.
+  let [_, owner, signer, testUser, invalidSigner, testUser2] = accounts
+  // It should pass all test cases of the bancor protocol.
   context('It follows the bancor protocol', async () => {
     it('should follow the bancor protocol', async () => {
       Contract(TokenPool).follows(Protocol.TokenHolder)
     })
   })
+
   context('It has customized features', async () => {
     let contracts
     before(async () => {
-      contracts = await deployContracts(artifacts, accounts)
+      contracts = await deployContracts(artifacts, owner, signer)
     })
 
     let converter
@@ -24,13 +26,13 @@ contract('TokenPool', async (accounts) => {
     let cnusToken
     let tokenPool
     beforeEach(async () => {
-      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, accounts, contracts)
-      await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(1000000))
+      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, contracts, owner, signer, testUser)
+      await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(1000000), { from: owner })
     })
 
     describe('Events', async () => {
       it('should emit Airdrop event when the admin proceeded airdrops', async () => {
-        let receipt = await tokenPool.airdropBnus(accounts[1], 10000)
+        let receipt = await tokenPool.airdropBnus(testUser2, 10000, { from: owner })
         let airdropEvent
         receipt.logs.forEach(log => {
             if (log.event === 'Airdrop') {
@@ -60,16 +62,16 @@ contract('TokenPool', async (accounts) => {
       const AMOUNT = 10000
       describe('airdropCnus()', async () => {
         beforeEach(async () => {
-          await cnusToken.transfer(tokenPool.address, 100000, { from: accounts[1] })
+          await cnusToken.transfer(tokenPool.address, 100000, { from: owner })
         })
         it('should withdraw cnus tokens held by the contract and send them to the designated account', async () => {
-          await tokenPool.airdropCnus(accounts[2], AMOUNT)
-          let balance = await cnusToken.balanceOf(accounts[2])
+          await tokenPool.airdropCnus(testUser2, AMOUNT, { from: owner })
+          let balance = await cnusToken.balanceOf(testUser2)
           balance.toNumber().should.equal(AMOUNT)
         })
         it('should allow only the owner to call', async () => {
           try {
-            await tokenPool.airdropCnus(accounts[2], AMOUNT, { from: accounts[1] })
+            await tokenPool.airdropCnus(testUser2, AMOUNT, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -78,13 +80,13 @@ contract('TokenPool', async (accounts) => {
       })
       describe('airdropBnus()', async () => {
         it('should withdraw bnus tokens held by the contract and send them to the designated account', async () => {
-          await tokenPool.airdropBnus(accounts[2], AMOUNT)
-          let balance = await bnusToken.balanceOf(accounts[2])
+          await tokenPool.airdropBnus(testUser2, AMOUNT, { from: owner })
+          let balance = await bnusToken.balanceOf(testUser2)
           balance.toNumber().should.equal(AMOUNT)
         })
         it('should allow only the owner to call', async () => {
           try {
-            await tokenPool.airdropBnus(accounts[2], AMOUNT, { from: accounts[1] })
+            await tokenPool.airdropBnus(testUser2, AMOUNT, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -93,18 +95,22 @@ contract('TokenPool', async (accounts) => {
       })
       describe('batchAirdropCnus()', async () => {
         beforeEach(async () => {
-          await cnusToken.transfer(tokenPool.address, 100000, { from: accounts[1] })
+          await cnusToken.transfer(tokenPool.address, 100000, { from: owner })
         })
         it('should withdraw cnus tokens held by the contract and send them to the designated accounts', async () => {
-          await tokenPool.batchAirdropCnus(accounts.slice(2, 5), Array(3).fill(AMOUNT))
+          let initialBalances = {}
+          for (let account of accounts.slice(2, 5)) {
+            initialBalances[account] = await cnusToken.balanceOf(account)
+          }
+          await tokenPool.batchAirdropCnus(accounts.slice(2, 5), Array(3).fill(AMOUNT), { from: owner })
           for (let account of accounts.slice(2, 5)) {
             let balance = await cnusToken.balanceOf(account)
-            balance.toNumber().should.equal(AMOUNT)
+            balance.sub(initialBalances[account]).equals(AMOUNT).should.equal(true)
           }
         })
         it('should allow only the owner to call', async () => {
           try {
-            await tokenPool.batchAirdropCnus(accounts.slice(1, 4), Array(3).fill(AMOUNT), { from: accounts[1] })
+            await tokenPool.batchAirdropCnus(accounts.slice(1, 4), Array(3).fill(AMOUNT), { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -113,7 +119,7 @@ contract('TokenPool', async (accounts) => {
       })
       describe('batchAirdropBnus()', async () => {
         it('should withdraw bnus tokens held by the contract and send them to the designated accounts', async () => {
-          await tokenPool.batchAirdropBnus(accounts.slice(2, 5), Array(3).fill(AMOUNT))
+          await tokenPool.batchAirdropBnus(accounts.slice(2, 5), Array(3).fill(AMOUNT), { from: owner })
           for (let account of accounts.slice(2, 5)) {
             let balance = await bnusToken.balanceOf(account)
             balance.toNumber().should.equal(AMOUNT)
@@ -121,7 +127,7 @@ contract('TokenPool', async (accounts) => {
         })
         it('should allow only the owner to call', async () => {
           try {
-            await tokenPool.batchAirdropBnus(accounts.slice(1, 4), Array(3).fill(AMOUNT), { from: accounts[1] })
+            await tokenPool.batchAirdropBnus(accounts.slice(1, 4), Array(3).fill(AMOUNT), { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -134,7 +140,7 @@ contract('TokenPool', async (accounts) => {
           let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, amount)
           let initialCnus = await tokenPool.getCnusBalance()
           let initialBnus = await tokenPool.getBnusBalance()
-          await tokenPool.bnusToCnus(amount, expectedCnus)
+          await tokenPool.bnusToCnus(amount, expectedCnus, { from: owner })
           let updatedCnus = await tokenPool.getCnusBalance()
           let updatedBnus = await tokenPool.getBnusBalance()
           updatedCnus.toNumber().should.equal(initialCnus.toNumber() + expectedCnus.toNumber() + fee.toNumber())
@@ -144,7 +150,7 @@ contract('TokenPool', async (accounts) => {
           let amount = 10000
           let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, amount)
           try {
-            await tokenPool.bnusToCnus(amount, expectedCnus, { from: accounts[1] })
+            await tokenPool.bnusToCnus(amount, expectedCnus, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -153,14 +159,14 @@ contract('TokenPool', async (accounts) => {
       })
       describe('cnusToBnus()', async () => {
         beforeEach(async () => {
-          await cnusToken.transfer(tokenPool.address, 100000, { from: accounts[1] })
+          await cnusToken.transfer(tokenPool.address, 100000, { from: owner })
         })
         it('should convert holding Cnus to Bnus', async () => {
           let amount = 10000
           let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, amount)
           let initialCnus = await tokenPool.getCnusBalance()
           let initialBnus = await tokenPool.getBnusBalance()
-          await tokenPool.cnusToBnus(amount, expectedBnus)
+          await tokenPool.cnusToBnus(amount, expectedBnus, { from: owner })
           let updatedCnus = await tokenPool.getCnusBalance()
           let updatedBnus = await tokenPool.getBnusBalance()
           updatedCnus.toNumber().should.equal(initialCnus.toNumber() - amount)
@@ -170,7 +176,7 @@ contract('TokenPool', async (accounts) => {
           let amount = 10000
           let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, amount)
           try {
-            await tokenPool.cnusToBnus(amount, expectedBnus, { from: accounts[1] })
+            await tokenPool.cnusToBnus(amount, expectedBnus, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)

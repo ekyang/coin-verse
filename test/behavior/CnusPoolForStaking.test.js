@@ -3,12 +3,13 @@ const assert = chai.assert
 const BigNumber = web3.BigNumber
 const should = chai.use(require('chai-bignumber')(BigNumber)).should()
 const { Contract, Protocol } = require('../protocol/Bancor')
-const { deployContracts, initConverter } = require('../helper')
+const { deployContracts, initConverter, encodePacked, toUint256 } = require('../helper')
 
 const CnusPoolForStaking = artifacts.require('CnusPoolForStaking.sol')
 
 contract('CnusPoolForStaking', async (accounts) => {
-  // Basically, it should pass all test cases of the bancor protocol.
+  let [_, owner, signer, testUser, invalidSigner] = accounts
+  // It should pass all test cases of the bancor protocol.
   context('It follows the bancor protocol', async () => {
     it('should follow the bancor protocol', async () => {
       Contract(CnusPoolForStaking).follows(Protocol.TokenHolder)
@@ -16,20 +17,18 @@ contract('CnusPoolForStaking', async (accounts) => {
   })
 
   context('It has customized features', async () => {
-    let SAMPLE_UDID = '0x1234'
     let contracts
     beforeEach(async () => {
-      contracts = await deployContracts(artifacts, accounts)
+      contracts = await deployContracts(artifacts, owner, signer)
     })
 
     let converter, bnusToken, cnusToken, tokenPool, cnusPoolForStaking
     beforeEach(async () => {
-      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, accounts, contracts)
+      [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, contracts, owner, signer, testUser)
       cnusPoolForStaking = contracts.cnusPoolForStaking
       for (let account of accounts.slice(1, 5)) {
-        await cnusToken.transfer(account, 100000)
+        await cnusToken.transfer(account, 100000, { from: owner })
       }
-      await cnusPoolForStaking.setCoinUsAccount(accounts[0])
     })
 
     const AMOUNT = 10000
@@ -39,14 +38,14 @@ contract('CnusPoolForStaking', async (accounts) => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
           await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: account })
-          let receipt = await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: account })
+          let receipt = await cnusPoolForStaking.stake(AMOUNT, expiration, signature, { from: account })
           let depositEvent
           receipt.logs.forEach(log => {
               if (log.event === 'Deposit') {
@@ -64,26 +63,26 @@ contract('CnusPoolForStaking', async (accounts) => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
           await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: account })
-          await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: account })
+          await cnusPoolForStaking.stake(AMOUNT, expiration, signature, { from: account })
         }
         for (let account of accounts.slice(1, 5)) {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
-          let receipt = await cnusPoolForStaking.withdraw(AMOUNT, SAMPLE_UDID, expiration, signature, { from: account })
+          let receipt = await cnusPoolForStaking.withdraw(AMOUNT, expiration, signature, { from: account })
           let withdrawalEvent
           receipt.logs.forEach(log => {
               if (log.event === 'Withdrawal') {
@@ -104,14 +103,14 @@ contract('CnusPoolForStaking', async (accounts) => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
           await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: account })
-          await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: account })
+          await cnusPoolForStaking.stake(AMOUNT, expiration, signature, { from: account })
         }
       })
       describe('getStakedAmount()', async () => {
@@ -134,13 +133,13 @@ contract('CnusPoolForStaking', async (accounts) => {
     describe('TxFunctions', async () => {
       describe('setCoinUsAccount()', async () => {
         it('should assign the given address as a signer address', async () => {
-          await cnusPoolForStaking.setCoinUsAccount(accounts[1])
+          await cnusPoolForStaking.setCoinUsAccount(signer, { from: owner })
           let coinUsAccount = await cnusPoolForStaking.coinUsAccount.call()
-          coinUsAccount.should.equal(accounts[1])
+          coinUsAccount.should.equal(signer)
         })
         it('should be called by only the owner', async () => {
           try {
-            await cnusPoolForStaking.setCoinUsAccount(accounts[1], { from: accounts[1] })
+            await cnusPoolForStaking.setCoinUsAccount(signer, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -152,30 +151,30 @@ contract('CnusPoolForStaking', async (accounts) => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
-          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: accounts[2] })
-          await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
-          let stakedAmount = await cnusPoolForStaking.getStakedAmount({ from: accounts[2] })
+          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: testUser })
+          await cnusPoolForStaking.stake(AMOUNT, expiration, signature, { from: testUser })
+          let stakedAmount = await cnusPoolForStaking.getStakedAmount({ from: testUser })
           stakedAmount.toNumber().should.equal(AMOUNT)
         })
-        it('should check udid & signature is signed with the registered address', async () => {
+        it('should check signature is signed with the registered address', async () => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[1], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(invalidSigner, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[1])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, invalidSigner)
           }
-          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: accounts[2] })
+          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: testUser })
           try {
-            await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
+            await cnusPoolForStaking.stake(AMOUNT, expiration, signature, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -185,15 +184,15 @@ contract('CnusPoolForStaking', async (accounts) => {
           let invalidExpiration = Math.round((new Date).getTime() / 1000) - 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(invalidExpiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(invalidExpiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
-          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: accounts[2] })
+          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: testUser })
           try {
-            await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, invalidExpiration, signature, { from: accounts[2] })
+            await cnusPoolForStaking.stake(AMOUNT, invalidExpiration, signature, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -205,47 +204,46 @@ contract('CnusPoolForStaking', async (accounts) => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
-          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: accounts[2] })
-          await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
-          let stakedAmount = await cnusPoolForStaking.getStakedAmount({ from: accounts[2] })
+          await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: testUser })
+          await cnusPoolForStaking.stake(AMOUNT, expiration, signature, { from: testUser })
+          let stakedAmount = await cnusPoolForStaking.getStakedAmount({ from: testUser })
           stakedAmount.toNumber().should.equal(AMOUNT)
         })
         it('should transfer Cnus from the contract to the user\'s account', async () => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
-          let initialCnus = await cnusToken.balanceOf(accounts[2])
-          await cnusPoolForStaking.withdraw(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
-          let stakedAmount = await cnusPoolForStaking.getStakedAmount({ from: accounts[2] })
-          let updatedCnus = await cnusToken.balanceOf(accounts[2])
+          let initialCnus = await cnusToken.balanceOf(testUser)
+          await cnusPoolForStaking.withdraw(AMOUNT, expiration, signature, { from: testUser })
+          let stakedAmount = await cnusPoolForStaking.getStakedAmount({ from: testUser })
+          let updatedCnus = await cnusToken.balanceOf(testUser)
           stakedAmount.toNumber().should.equal(0)
           updatedCnus.toNumber().should.equal(initialCnus.toNumber() + AMOUNT)
         })
         it('should check udid & signature is signed with the registered address', async () => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
-          let invalidSigner = accounts[1]
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
             signature = web3.eth.sign(invalidSigner, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(expiration)]), { encoding: 'hex' })
             signature = web3.eth.sign(hashToSign, invalidSigner)
           }
           try {
-            await cnusPoolForStaking.withdraw(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
+            await cnusPoolForStaking.withdraw(AMOUNT, expiration, signature, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -255,14 +253,14 @@ contract('CnusPoolForStaking', async (accounts) => {
           let invalidExpiration = Math.round((new Date).getTime() / 1000) - 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[0], hashToSign)
+            hashToSign = web3.sha3(encodePacked([toUint256(AMOUNT), toUint256(invalidExpiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(signer, hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[0])
+            hashToSign = web3.utils.sha3(encodePacked([toUint256(AMOUNT), toUint256(invalidExpiration)]), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, signer)
           }
           try {
-            await cnusPoolForStaking.withdraw(AMOUNT, SAMPLE_UDID, invalidExpiration, signature, { from: accounts[2] })
+            await cnusPoolForStaking.withdraw(AMOUNT, invalidExpiration, signature, { from: testUser })
             assert(false)
           } catch (e) {
             e.message.includes('revert').should.equal(true)
@@ -272,12 +270,3 @@ contract('CnusPoolForStaking', async (accounts) => {
     })
   })
 })
-
-let toUint256 = (number) => {
-  let hex = web3.toHex(number).slice(2)
-  return '0x' + Array(64 - hex.length).fill(0).join('') + hex
-}
-
-let encodePacked = (amount, udid, expiration) => {
-  return '0x' + toUint256(amount).slice(2) + udid.slice(2) + toUint256(expiration).slice(2)
-}

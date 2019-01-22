@@ -2,18 +2,15 @@ pragma solidity ^0.4.24;
 
 import "bancor-contracts/solidity/contracts/utility/TokenHolder.sol";
 import "bancor-contracts/solidity/contracts/utility/interfaces/IContractRegistry.sol";
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./CoinVerseContractIds.sol";
+import "./CoinUsOnly.sol";
 import "./interfaces/ICnusPoolForStaking.sol";
 
-contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContractIds {
-    using ECDSA for bytes32;
+contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContractIds, CoinUsOnly {
     using SafeMath for uint256;
 
-
     IContractRegistry registry;
-    address public coinUsAccount;
     mapping(address => uint256) staking;
 
     event Deposit(address indexed _account, uint256 _amount, uint256 _timestamp);
@@ -25,28 +22,18 @@ contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContra
         registry = IContractRegistry(_registry);
     }
 
-    modifier coinUsOnly(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature) {
-        bytes32 hash = keccak256(abi.encodePacked(_amount, _udid, _expiration));
-        address _signer = hash.toEthSignedMessageHash().recover(_signature);
-        require(_signer == coinUsAccount);
-        require(now <= _expiration);
-        _;
-    }
-
-
     function setCoinUsAccount(address _account) public ownerOnly {
-        coinUsAccount = _account;
+        _setCoinUsAccount(_account);
     }
-
     /**
        @dev can stake Cnus
        @param _amount amount of Cnus to stake
-       @param _udid  unique Device Id to prevent abusing
-       @param _signature signed udid with the private key of CoinUs wallet
+       @param _expiration the signature will expire after the given timestamp
+       @param _signature signed hash value with the private key of CoinUs wallet
     */
-    function stake(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature)
+    function stake(uint256 _amount, uint256 _expiration, bytes _signature)
     public
-    coinUsOnly(_amount, _udid, _expiration, _signature)
+    coinUsOnly(registry, abi.encodePacked(_amount), _expiration, _signature)
     {
         IERC20Token(registry.addressOf(CNUS_TOKEN)).transferFrom(msg.sender, this, _amount);
         staking[msg.sender] = staking[msg.sender].add(_amount);
@@ -56,12 +43,12 @@ contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContra
     /**
        @dev withdrawing for approved requests
        @param _amount amount of Cnus to withdraw
-       @param _udid  unique Device Id to prevent abusing
-       @param _signature signed udid with the private key of CoinUs wallet
+       @param _expiration the signature will expire after the given timestamp
+       @param _signature signed hash value with the private key of CoinUs wallet
     */
-    function withdraw(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature)
+    function withdraw(uint256 _amount, uint256 _expiration, bytes _signature)
     public
-    coinUsOnly(_amount, _udid, _expiration, _signature)
+    coinUsOnly(registry, abi.encodePacked(_amount), _expiration, _signature)
     {
         require(staking[msg.sender] >= _amount);
         IERC20Token(registry.addressOf(CNUS_TOKEN)).transfer(msg.sender, _amount);

@@ -3,8 +3,9 @@ const BnusToken = artifacts.require('BnusToken.sol')
 const CnusTokenMockUp = artifacts.require('CnusTokenMockUp.sol')
 const TokenPool = artifacts.require('TokenPool.sol')
 const assert = require('assert')
+const SAMPLE_COINUS_WALLET = '0x081a83d772284f881d41ac3d3258c32164d0872d' // seed: coinus
 
-module.exports = function (deployer, network, accounts) {
+module.exports = function (deployer, network) {
   if (network === 'development') return
   deployer.then(() => {
     return BnusConverter.deployed()
@@ -26,6 +27,7 @@ module.exports = function (deployer, network, accounts) {
     await bnus.issue(bnusConverter.address, web3.toWei(20000000))
     await bnus.transferOwnership(bnusConverter.address)
     await bnusConverter.acceptTokenOwnership()
+    await bnusConverter.setCoinUsAccount(SAMPLE_COINUS_WALLET)
 
     if (network !== 'mainnet') {
       await cnus.transfer(bnusConverter.address, web3.toWei(1000000))

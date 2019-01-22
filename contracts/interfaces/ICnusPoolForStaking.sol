@@ -4,18 +4,18 @@ contract ICnusPoolForStaking {
     /**
        @dev can stake Cnus
        @param _amount amount of Cnus to stake
-       @param _udid  unique Device Id to prevent abusing
-       @param _signature signed udid with the private key of CoinUs wallet
+       @param _expiration the signature will expire after the given timestamp
+       @param _signature signed hash value with the private key of CoinUs wallet
     */
-    function stake(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature) public;
+    function stake(uint256 _amount, uint256 _expiration, bytes _signature) public;
 
     /**
        @dev withdrawing for approved requests
        @param _amount amount of Cnus to withdraw
-       @param _udid  unique Device Id to prevent abusing
-       @param _signature signed udid with the private key of CoinUs wallet
+       @param _expiration the signature will expire after the given timestamp
+       @param _signature signed hash value with the private key of CoinUs wallet
     */
-    function withdraw(uint256 _amount, bytes _udid, uint256 _expiration, bytes _signature) public;
+    function withdraw(uint256 _amount, uint256 _expiration, bytes _signature) public;
 
     /**
         @dev returns total amount of staked Cnus

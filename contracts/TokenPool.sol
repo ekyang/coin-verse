@@ -79,7 +79,7 @@ contract TokenPool is ITokenPool, TokenHolder, CoinVerseContractIds {
     function bnusToCnus(uint256 _amount, uint256 _minReturn) public ownerOnly {
         address bnus = registry.addressOf(BNUS_TOKEN);
         address bnusConverter = Owned(bnus).owner();
-        IBnusConverter(bnusConverter).sellBnus(_amount, _minReturn);
+        IBnusConverter(bnusConverter).sellBnus(_amount, _minReturn, 0, "0x");
     }
 
     function cnusToBnus(uint256 _amount, uint256 _minReturn) public ownerOnly {
@@ -88,7 +88,7 @@ contract TokenPool is ITokenPool, TokenHolder, CoinVerseContractIds {
         address bnusConverter = Owned(bnus).owner();
         IERC20Token cnusToken = IERC20Token(cnus);
         cnusToken.approve(bnusConverter, _amount);
-        IBnusConverter(bnusConverter).buyBnus(_amount, _minReturn);
+        IBnusConverter(bnusConverter).buyBnus(_amount, _minReturn, 0, "0x");
     }
 
     function getBnusBalance() public view returns (uint256) {

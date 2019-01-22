@@ -1,11 +1,12 @@
 pragma solidity ^0.4.24;
 
 import "./CoinVerseContractIds.sol";
+import "./CoinUsOnly.sol";
 import "./interfaces/IBnusConverter.sol";
 import "bancor-contracts/solidity/contracts/converter/BancorConverter.sol";
 import "bancor-contracts/solidity/contracts/converter/interfaces/IBancorGasPriceLimit.sol";
 
-contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds {
+contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds, CoinUsOnly {
     constructor (
         ISmartToken _token,
         IContractRegistry _registry,
@@ -23,16 +24,21 @@ contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds 
         _;
     }
 
+    function setCoinUsAccount(address _account) public ownerOnly {
+        _setCoinUsAccount(_account);
+    }
     /**
     * @dev Customized function for Coin Verse system
     * @param _depositAmount amount of Cnus to buy Bnus
     * @param _minReturn expected minimum return of Bnus. It is cancelled when the returned amount of Bnus is smaller
      than the _minReturn,
+    * @param _expiration the signature will expire after the given timestamp
+    * @param _signature signed hash value with the private key of CoinUs wallet
     */
-    function buyBnus(uint256 _depositAmount, uint256 _minReturn)
+    function buyBnus(uint256 _depositAmount, uint256 _minReturn, uint256 _expiration, bytes memory _signature)
     public
     preventFrontRunning
-    returns (uint256 _cnus)
+    coinUsOnly(registry, abi.encodePacked(_depositAmount, _minReturn), _expiration, _signature)
     {
         uint256 amount;
         uint256 feeAmount;
@@ -40,7 +46,6 @@ contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds 
         (amount, feeAmount) = getPurchaseReturn(cnus, _depositAmount);
         buy(cnus, _depositAmount, _minReturn);
         token.issue(registry.addressOf(TOKEN_POOL), feeAmount);
-        return amount;
     }
 
     /**
@@ -48,11 +53,13 @@ contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds 
      * @param _sellAmount amount of Cnus to buy Bnus
      * @param _minReturn expected minimum return of Bnus. It is cancelled when the returned amount of Bnus is smaller
       than the _minReturn,
+     * @param _expiration the signature will expire after the given timestamp
+     * @param _signature signed hash value with the private key of CoinUs wallet
      */
-    function sellBnus(uint256 _sellAmount, uint256 _minReturn)
+    function sellBnus(uint256 _sellAmount, uint256 _minReturn, uint256 _expiration, bytes memory _signature)
     public
     preventFrontRunning
-    returns (uint256 _bnus)
+    coinUsOnly(registry, abi.encodePacked(_sellAmount, _minReturn), _expiration, _signature)
     {
         uint256 amount;
         uint256 feeAmount;
@@ -60,7 +67,6 @@ contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds 
         (amount, feeAmount) = getSaleReturn(cnus, _sellAmount);
         sell(cnus, _sellAmount, _minReturn);
         assert(cnus.transfer(registry.addressOf(TOKEN_POOL), feeAmount));
-        return amount;
     }
 
     /**

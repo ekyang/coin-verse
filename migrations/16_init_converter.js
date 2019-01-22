@@ -5,7 +5,7 @@ const TokenPool = artifacts.require('TokenPool.sol')
 const assert = require('assert')
 
 module.exports = function (deployer, network, accounts) {
-  if(network === 'development') return
+  if (network === 'development') return
   deployer.then(() => {
     return BnusConverter.deployed()
   }).then(async (bnusConverter) => {
@@ -30,7 +30,7 @@ module.exports = function (deployer, network, accounts) {
     if (network !== 'mainnet') {
       await cnus.transfer(bnusConverter.address, web3.toWei(1000000))
     } else {
-      console.log("Please transfer 1,000,000 CNUS to BnusConverter contract at ", BnusConverter.address)
+      console.log('Please transfer 1,000,000 CNUS to BnusConverter contract at ', BnusConverter.address)
     }
   })
 }

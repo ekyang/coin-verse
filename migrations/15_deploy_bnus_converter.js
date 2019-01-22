@@ -5,7 +5,7 @@ const ContractRegistry = artifacts.require('ContractRegistry.sol')
 const assert = require('assert')
 
 module.exports = async function (deployer, network, accounts) {
-  if(network === 'development') return
+  if (network === 'development') return
   deployer.then(() => {
     return ContractRegistry.deployed()
   }).then(async (registry) => {
@@ -27,7 +27,8 @@ module.exports = async function (deployer, network, accounts) {
       registry.address,
       100000,
       cnus.address,
-      50000
+      50000,
+      { overwrite: false }
     )
   })
 }

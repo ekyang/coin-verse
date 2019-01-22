@@ -29,6 +29,7 @@ contract CnusPoolForStaking is ICnusPoolForStaking, TokenHolder, CoinVerseContra
         bytes32 hash = keccak256(abi.encodePacked(_amount, _udid, _expiration));
         address _signer = hash.toEthSignedMessageHash().recover(_signature);
         require(_signer == coinUsAccount);
+        require(now <= _expiration);
         _;
     }
 

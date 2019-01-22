@@ -139,10 +139,12 @@ contract('CnusPoolForStaking', async (accounts) => {
           coinUsAccount.should.equal(accounts[1])
         })
         it('should be called by only the owner', async () => {
-          try{
+          try {
             await cnusPoolForStaking.setCoinUsAccount(accounts[1], { from: accounts[1] })
-            assert(false, 'Not reverted')
-          } catch (e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
       })
       describe('stake()', async () => {
@@ -174,28 +176,32 @@ contract('CnusPoolForStaking', async (accounts) => {
           await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: accounts[2] })
           try {
             await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
-            assert(false, 'Not reverted')
-          } catch (e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
         it('should check expiration date is valid', async () => {
-          let expiration = Math.round((new Date).getTime() / 1000) - 300
+          let invalidExpiration = Math.round((new Date).getTime() / 1000) - 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
-            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(accounts[1], hashToSign)
+            hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
+            signature = web3.eth.sign(accounts[0], hashToSign)
           } else {
-            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, expiration), { encoding: 'hex' })
-            signature = web3.eth.sign(hashToSign, accounts[1])
+            hashToSign = web3.utils.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
+            signature = web3.eth.sign(hashToSign, accounts[0])
           }
           await cnusToken.approve(cnusPoolForStaking.address, AMOUNT, { from: accounts[2] })
           try {
-            await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
-            assert(false, 'Not reverted')
-          } catch (e) {}
+            await cnusPoolForStaking.stake(AMOUNT, SAMPLE_UDID, invalidExpiration, signature, { from: accounts[2] })
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
       })
       describe('withdraw()', async () => {
-        beforeEach(async() => {
+        beforeEach(async () => {
           let expiration = Math.round((new Date).getTime() / 1000) + 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
@@ -240,11 +246,13 @@ contract('CnusPoolForStaking', async (accounts) => {
           }
           try {
             await cnusPoolForStaking.withdraw(AMOUNT, SAMPLE_UDID, expiration, signature, { from: accounts[2] })
-            assert(false, 'Not reverted')
-          } catch(e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
         it('should check expiration date is valid', async () => {
-          let invalidExpiration = Math.round((new Date).getTime() / 1000) + 300
+          let invalidExpiration = Math.round((new Date).getTime() / 1000) - 300
           let hashToSign, signature
           if (web3.version.api < '1.0.0') {
             hashToSign = web3.sha3(encodePacked(AMOUNT, SAMPLE_UDID, invalidExpiration), { encoding: 'hex' })
@@ -255,8 +263,10 @@ contract('CnusPoolForStaking', async (accounts) => {
           }
           try {
             await cnusPoolForStaking.withdraw(AMOUNT, SAMPLE_UDID, invalidExpiration, signature, { from: accounts[2] })
-            assert(false, 'Not reverted')
-          } catch(e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
       })
     })

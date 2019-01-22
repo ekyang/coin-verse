@@ -25,6 +25,7 @@ contract('TokenPool', async (accounts) => {
     let tokenPool
     beforeEach(async () => {
       [converter, bnusToken, cnusToken, tokenPool] = await initConverter(artifacts, accounts, contracts)
+      await converter.withdrawTokens(bnusToken.address, tokenPool.address, web3.toWei(1000000))
     })
 
     describe('Events', async () => {
@@ -69,8 +70,9 @@ contract('TokenPool', async (accounts) => {
         it('should allow only the owner to call', async () => {
           try {
             await tokenPool.airdropCnus(accounts[2], AMOUNT, { from: accounts[1] })
-            assert(false, 'Not reverted')
+            assert(false)
           } catch (e) {
+            e.message.includes('revert').should.equal(true)
           }
         })
       })
@@ -83,8 +85,9 @@ contract('TokenPool', async (accounts) => {
         it('should allow only the owner to call', async () => {
           try {
             await tokenPool.airdropBnus(accounts[2], AMOUNT, { from: accounts[1] })
-            assert(false, 'Not reverted')
+            assert(false)
           } catch (e) {
+            e.message.includes('revert').should.equal(true)
           }
         })
       })
@@ -102,8 +105,9 @@ contract('TokenPool', async (accounts) => {
         it('should allow only the owner to call', async () => {
           try {
             await tokenPool.batchAirdropCnus(accounts.slice(1, 4), Array(3).fill(AMOUNT), { from: accounts[1] })
-            assert(false, 'Not reverted')
+            assert(false)
           } catch (e) {
+            e.message.includes('revert').should.equal(true)
           }
         })
       })
@@ -118,8 +122,10 @@ contract('TokenPool', async (accounts) => {
         it('should allow only the owner to call', async () => {
           try {
             await tokenPool.batchAirdropBnus(accounts.slice(1, 4), Array(3).fill(AMOUNT), { from: accounts[1] })
-            assert(false, 'Not reverted')
-          } catch (e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
       })
       describe('bnusToCnus()', async () => {
@@ -139,8 +145,10 @@ contract('TokenPool', async (accounts) => {
           let [expectedCnus, fee] = await converter.getSaleReturn(cnusToken.address, amount)
           try {
             await tokenPool.bnusToCnus(amount, expectedCnus, { from: accounts[1] })
-            assert(false, 'Not reverted')
-          } catch (e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
       })
       describe('cnusToBnus()', async () => {
@@ -163,8 +171,10 @@ contract('TokenPool', async (accounts) => {
           let [expectedBnus, fee] = await converter.getPurchaseReturn(cnusToken.address, amount)
           try {
             await tokenPool.cnusToBnus(amount, expectedBnus, { from: accounts[1] })
-            assert(false, 'Not reverted')
-          } catch (e) {}
+            assert(false)
+          } catch (e) {
+            e.message.includes('revert').should.equal(true)
+          }
         })
       })
     })

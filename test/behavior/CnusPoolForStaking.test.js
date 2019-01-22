@@ -9,7 +9,7 @@ const CnusPoolForStaking = artifacts.require('CnusPoolForStaking.sol')
 
 contract('CnusPoolForStaking', async (accounts) => {
   let [_, owner, signer, testUser, invalidSigner] = accounts
-  // Basically, it should pass all test cases of the bancor protocol.
+  // It should pass all test cases of the bancor protocol.
   context('It follows the bancor protocol', async () => {
     it('should follow the bancor protocol', async () => {
       Contract(CnusPoolForStaking).follows(Protocol.TokenHolder)

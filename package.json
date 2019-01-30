@@ -23,8 +23,8 @@
   },
   "scripts": {
     "coverage": "scripts/coverage.sh",
-    "build": "truffle compile",
-    "migrate": "truffle migrate",
+    "build": "./node_modules/.bin/truffle compile",
+    "migrate": "./node_modules/.bin/truffle migrate",
     "test": "scripts/test.sh",
     "flatten": "scripts/flatten.sh"
   },

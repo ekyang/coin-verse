@@ -82,6 +82,16 @@ contract BnusConverter is IBnusConverter, BancorConverter, CoinVerseContractIds,
     }
 
     /**
+        @dev returns Total supply of BNUS and reserved amount of CNUS in the converter
+        @param _totalBnus Total supply of BNUS token
+        @param _reservedCnus Total amount of reserved CNUS in this converter
+    */
+    function getStats() public view returns (uint256 _totalBnus, uint256 _reservedCnus) {
+        _totalBnus = token.totalSupply();
+        _reservedCnus = getCnusBalance();
+    }
+
+    /**
      * @dev returns expected amount of Bnus for the given Cnus
      */
     function getExpectedBnus(uint256 _cnus)

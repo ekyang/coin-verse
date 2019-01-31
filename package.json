@@ -13,9 +13,10 @@
     "solidity-coverage": "^0.5.11",
     "solidity-docgen": "^0.1.0",
     "standard": "^12.0.1",
-    "truffle": "4.1.14",
+    "truffle": "4.1.15",
     "truffle-flattener": "^1.2.10",
-    "truffle-hdwallet-provider": "^0.0.5"
+    "truffle-hdwallet-provider": "^0.0.5",
+    "typedarray-to-buffer": "^3.1.5"
   },
   "dependencies": {
     "openzeppelin-solidity": "2.0.0",
@@ -26,6 +27,7 @@
     "build": "./node_modules/.bin/truffle compile",
     "migrate": "./node_modules/.bin/truffle migrate",
     "test": "scripts/test.sh",
+    "migrateRopsten": "./node_modules/.bin/truffle migrate --network ropsten && npm run flatten",
     "flatten": "scripts/flatten.sh"
   },
   "repository": {

@@ -49,8 +49,8 @@ Version: 0.1.4
 ## Development status
 
 - [Milestones](https://github.com/James-Lim/coin-verse/milestones)
-- [0.1.0](https://github.com/james-lim/coin-verse/projects/1)
-- [0.2.0](https://github.com/james-lim/coin-verse/projects/2)
+- [0.1.0](https://github.com/wanseob/coin-verse/projects/1)
+- [0.2.0](https://github.com/wanseob/coin-verse/projects/2)
 
 
 ### Development environment
@@ -64,7 +64,7 @@ Version: 0.1.4
 1. Clone repository
 
    ```bash
-   git clone https://github.com/james-lim/coin-verse
+   git clone https://github.com/wanseob/coin-verse
    ```
 
 2. Install packages

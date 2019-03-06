@@ -2,6 +2,11 @@ language: node_js
 node_js:
   - stable
 
+before_install:
+  - cp $(which node) $(which node)_bin
+  - echo "#\!/bin/bash" > $(which node)
+  - echo "$(which node)_bin --stack-size=1200" >> $(which node)
+
 install:
   - npm install -g truffle
   - npm install -g ganache-cli
